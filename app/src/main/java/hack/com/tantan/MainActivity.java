@@ -34,33 +34,35 @@ import hack.com.tantan.test.PingTest;
 
 
 public class MainActivity extends AppCompatActivity {
-    static int position = 0;
-    static int lastPosition = 0;
-    GetSpeedTestHostsHandler getSpeedTestHostsHandler = null;
-    HashSet<String> tempBlackList;
-    final  String TAG = "MainActivity";
+    private static int mPosition = 0;
+    private static int mLastPosition = 0;
+    private GetSpeedTestHostsHandler mGetSpeedTestHostsHandler = null;
+    private HashSet<String> mTempBlackList;
+    private final  String TAG = "MainActivity";
+    private Button mStartButton = null;
+    private DecimalFormat mDec = null;
 
     @Override
     public void onResume() {
         super.onResume();
 
-        getSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        getSpeedTestHostsHandler.start();
+        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+        mGetSpeedTestHostsHandler.start();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mStartButton = (Button) findViewById(R.id.startButton);
+        mDec = new DecimalFormat("#.##");
 
-        final Button startButton = (Button) findViewById(R.id.startButton);
-        final DecimalFormat dec = new DecimalFormat("#.##");
-        startButton.setText("Begin Test");
+        mStartButton.setText("Begin Test");
 
-        tempBlackList = new HashSet<>();
+        mTempBlackList = new HashSet<>();
 
-        getSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        getSpeedTestHostsHandler.start();
+        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+        mGetSpeedTestHostsHandler.start();
 
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
@@ -75,14 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        startButton.setOnClickListener(new View.OnClickListener() {
+        mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                startButton.setEnabled(false);
+                mStartButton.setEnabled(false);
 
                 //Restart test icin eger baglanti koparsa
-                if (getSpeedTestHostsHandler == null) {
-                    getSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-                    getSpeedTestHostsHandler.start();
+                if (mGetSpeedTestHostsHandler == null) {
+                    mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+                    mGetSpeedTestHostsHandler.start();
                 }
 
                 new Thread(new Runnable() {
@@ -99,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                startButton.setText("Selecting best server based on ping...");
+                                mStartButton.setText("Selecting best server based on ping...");
                             }
                         });
 
                         //Get egcodes.speedtest hosts
                         int timeCount = 600; //1min
-                        while (!getSpeedTestHostsHandler.isFinished()) {
+                        while (!mGetSpeedTestHostsHandler.isFinished()) {
                             timeCount--;
                             try {
                                 Thread.sleep(100);
@@ -116,26 +118,26 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void run() {
                                         Toast.makeText(getApplicationContext(), "No Connection...", Toast.LENGTH_LONG).show();
-                                        startButton.setEnabled(true);
-                                        startButton.setTextSize(16);
-                                        startButton.setText("Restart Test");
+                                        mStartButton.setEnabled(true);
+                                        mStartButton.setTextSize(16);
+                                        mStartButton.setText("Restart Test");
                                     }
                                 });
-                                getSpeedTestHostsHandler = null;
+                                mGetSpeedTestHostsHandler = null;
                                 return;
                             }
                         }
 
                         //Find closest server
-                        HashMap<Integer, String> mapKey = getSpeedTestHostsHandler.getMapKey();
-                        HashMap<Integer, List<String>> mapValue = getSpeedTestHostsHandler.getMapValue();
-                        double selfLat = getSpeedTestHostsHandler.getSelfLat();
-                        double selfLon = getSpeedTestHostsHandler.getSelfLon();
+                        HashMap<Integer, String> mapKey = mGetSpeedTestHostsHandler.getMapKey();
+                        HashMap<Integer, List<String>> mapValue = mGetSpeedTestHostsHandler.getMapValue();
+                        double selfLat = mGetSpeedTestHostsHandler.getSelfLat();
+                        double selfLon = mGetSpeedTestHostsHandler.getSelfLon();
                         double tmp = 19349458;
                         double dist = 0.0;
                         int findServerIndex = 0;
                         for (int index : mapKey.keySet()) {
-                            if (tempBlackList.contains(mapValue.get(index).get(5))) {
+                            if (mTempBlackList.contains(mapValue.get(index).get(5))) {
                                 continue;
                             }
 
@@ -163,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    startButton.setTextSize(12);
-                                    startButton.setText("There was a problem in getting Host Location. Try again later.");
+                                    mStartButton.setTextSize(12);
+                                    mStartButton.setText("There was a problem in getting Host Location. Try again later.");
                                 }
                             });
                             return;
@@ -173,8 +175,8 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                startButton.setTextSize(13);
-                                startButton.setText(String.format("Host Location: %s [Distance: %s km]", info.get(2), new DecimalFormat("#.##").format(distance / 1000)));
+                                mStartButton.setTextSize(13);
+                                mStartButton.setText(String.format("Host Location: %s [Distance: %s km]", info.get(2), new DecimalFormat("#.##").format(distance / 1000)));
                             }
                         });
 
@@ -295,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            pingTextView.setText(dec.format(pingTest.getAvgRtt()) + " ms");
+                                            pingTextView.setText(mDec.format(pingTest.getAvgRtt()) + " ms");
                                         }
                                     });
                                 }
@@ -305,7 +307,7 @@ public class MainActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        pingTextView.setText(dec.format(pingTest.getInstantRtt()) + " ms");
+                                        pingTextView.setText(mDec.format(pingTest.getInstantRtt()) + " ms");
                                     }
                                 });
 
@@ -345,30 +347,30 @@ public class MainActivity extends AppCompatActivity {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                downloadTextView.setText(dec.format(downloadTest.getFinalDownloadRate()) + " Mbps");
+                                                downloadTextView.setText(mDec.format(downloadTest.getFinalDownloadRate()) + " Mbps");
                                             }
                                         });
                                     }
                                 } else {
-                                    //Calc position
+                                    //Calc mPosition
                                     double downloadRate = downloadTest.getInstantDownloadRate();
                                     downloadRateList.add(downloadRate);
-                                    position = getPositionByRate(downloadRate);
+                                    mPosition = getPositionByRate(downloadRate);
 
                                     runOnUiThread(new Runnable() {
 
                                         @Override
                                         public void run() {
-                                            rotate = new RotateAnimation(lastPosition, position, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                                            rotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                                             rotate.setInterpolator(new LinearInterpolator());
                                             rotate.setDuration(100);
                                             barImageView.startAnimation(rotate);
-                                            downloadTextView.setText(dec.format(downloadTest.getInstantDownloadRate()) + " Mbps");
+                                            downloadTextView.setText(mDec.format(downloadTest.getInstantDownloadRate()) + " Mbps");
 
                                         }
 
                                     });
-                                    lastPosition = position;
+                                    mLastPosition = mPosition;
 
                                     //Update chart
                                     runOnUiThread(new Runnable() {
@@ -407,29 +409,29 @@ public class MainActivity extends AppCompatActivity {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                uploadTextView.setText(dec.format(uploadTest.getFinalUploadRate()) + " Mbps");
+                                                uploadTextView.setText(mDec.format(uploadTest.getFinalUploadRate()) + " Mbps");
                                             }
                                         });
                                     }
                                 } else {
-                                    //Calc position
+                                    //Calc mPosition
                                     double uploadRate = uploadTest.getInstantUploadRate();
                                     uploadRateList.add(uploadRate);
-                                    position = getPositionByRate(uploadRate);
+                                    mPosition = getPositionByRate(uploadRate);
 
                                     runOnUiThread(new Runnable() {
 
                                         @Override
                                         public void run() {
-                                            rotate = new RotateAnimation(lastPosition, position, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                                            rotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                                             rotate.setInterpolator(new LinearInterpolator());
                                             rotate.setDuration(100);
                                             barImageView.startAnimation(rotate);
-                                            uploadTextView.setText(dec.format(uploadTest.getInstantUploadRate()) + " Mbps");
+                                            uploadTextView.setText(mDec.format(uploadTest.getInstantUploadRate()) + " Mbps");
                                         }
 
                                     });
-                                    lastPosition = position;
+                                    mLastPosition = mPosition;
 
                                     //Update chart
                                     runOnUiThread(new Runnable() {
@@ -491,9 +493,9 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                startButton.setEnabled(true);
-                                startButton.setTextSize(16);
-                                startButton.setText("Restart Test");
+                                mStartButton.setEnabled(true);
+                                mStartButton.setTextSize(16);
+                                mStartButton.setText("Restart Test");
                             }
                         });
 
