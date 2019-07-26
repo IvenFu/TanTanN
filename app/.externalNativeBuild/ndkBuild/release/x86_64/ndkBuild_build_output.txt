@@ -1,0 +1,17 @@
+rm -f /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/*
+rm -f /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/gdbserver
+rm -f /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/gdb.setup
+mkdir -p /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/objs/jnitest
+echo [x86_64] "Compile++      ": "jnitest <= jnitest.cpp"
+rm -f /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/objs/jnitest/jnitest.o
+/Users/iven/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ -MMD -MP -MF /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/objs/jnitest/jnitest.o.d -target x86_64-none-linux-android21 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes  --sysroot /Users/iven/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument  -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG  -I/Users/iven/Library/Android/sdk/ndk-bundle/sources/cxx-stl/system/include -I/Users/iven/Project/Hacker/tantan/app/src/main/jni     -DANDROID  -Wa,--noexecstack -Wformat -Werror=format-security   -c  /Users/iven/Project/Hacker/tantan/app/src/main/jni/jnitest.cpp -o /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/objs/jnitest/jnitest.o
+mkdir -p /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64
+echo [x86_64] "StaticLibrary  ": "libstdc++.a"
+rm -f /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libstdc++.a
+/Users/iven/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android-ar crsD  /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libstdc++.a 
+echo [x86_64] "SharedLibrary  ": "libjnitest.so"
+/Users/iven/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ -Wl,-soname,libjnitest.so -shared /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/objs/jnitest/jnitest.o /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libstdc++.a -lgcc -Wl,--exclude-libs,libgcc.a -latomic -Wl,--exclude-libs,libatomic.a -target x86_64-none-linux-android21 -no-canonical-prefixes    -Wl,--build-id -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--warn-shared-textrel -Wl,--fatal-warnings  -lm -llog -lstdc++ -lc -lm -o /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libjnitest.so
+mkdir -p /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64
+echo [x86_64] "Install        ": "libjnitest.so => /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/libjnitest.so"
+install -p /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libjnitest.so /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/libjnitest.so
+/Users/iven/Library/Android/sdk/ndk-bundle/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android-strip --strip-unneeded  /Users/iven/Project/Hacker/tantan/app/build/intermediates/ndkBuild/release/lib/x86_64/libjnitest.so
