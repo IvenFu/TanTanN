@@ -1,15 +1,17 @@
-package hack.com.tantan;
+package hack.com.tantan.main;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
@@ -32,22 +34,60 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import hack.com.tantan.GetSpeedTestHostsHandler;
+import hack.com.tantan.JavaUtils;
+import hack.com.tantan.R;
+import hack.com.tantan.main.contract.MainContractView;
+import hack.com.tantan.main.presenter.MainPresenter;
+import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.NetworkStatistic;
 import hack.com.tantan.test.PingTest;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private final String TAG = "MainActivity";
     private static int mPosition = 0;
     private static int mLastPosition = 0;
     private GetSpeedTestHostsHandler mGetSpeedTestHostsHandler = null;
     private HashSet<String> mTempBlackList;
-    private final  String TAG = "MainActivity";
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
-    /**测试用进程的名称*/
+    private Button mGoToDetailButton = null;
+    private MainPresenter mPresenter = null;
+    /**
+     * 测试用进程的名称
+     */
     private static final String PROB_THREAD_NAME = "ProbThread";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //沉浸式状态栏
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(getResources().getColor(R.color.colorPrimary2));
+
+        setContentView(R.layout.activity_main);
+
+        mStartButton = (Button) findViewById(R.id.btn_start);
+        mStartButton.setOnClickListener(this);
+        mDec = new DecimalFormat("#.##");
+
+        mStartButton.setText("Begin Test");
+
+        mTempBlackList = new HashSet<>();
+
+        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+        mGetSpeedTestHostsHandler.start();
+
+        mGoToDetailButton = findViewById(R.id.btn_detail);
+        mGoToDetailButton.setOnClickListener(this);
+        //for jniTest
+        jniTest();
+    }
 
     @Override
     public void onResume() {
@@ -58,24 +98,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mStartButton = (Button) findViewById(R.id.startButton);
-        mDec = new DecimalFormat("#.##");
-
-        mStartButton.setText("Begin Test");
-
-        mTempBlackList = new HashSet<>();
-
-        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        mGetSpeedTestHostsHandler.start();
-
-
-        //for jniTest
-        jniTest();
-        mStartButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_start:
                 mStartButton.setEnabled(false);
 
                 //Restart test icin eger baglanti koparsa
@@ -83,22 +108,28 @@ public class MainActivity extends AppCompatActivity {
                     mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
                     mGetSpeedTestHostsHandler.start();
                 }
-
                 //开启新线程来执行检测操作
                 startNewThread(PROB_THREAD_NAME, new ProbRunnable());
-            }
-        });
+                break;
+            case R.id.btn_detail:
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                MainActivity.this.startActivity(intent);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
      * 探测的Runnable
      */
-    class ProbRunnable implements Runnable{
+    class ProbRunnable implements Runnable {
         private RotateAnimation mRotate;
-        private ImageView mBarImageView = (ImageView) findViewById(R.id.barImageView);
+        private ImageView mBarImageView = (ImageView) findViewById(R.id.img_bar);
         private TextView mPingTextView = (TextView) findViewById(R.id.pingTextView);
         private TextView mDownloadTextView = (TextView) findViewById(R.id.downloadTextView);
         private TextView mUploadTextView = (TextView) findViewById(R.id.uploadTextView);
+
         @Override
         public void run() {
             runOnUiThread(new Runnable() {
@@ -109,14 +140,15 @@ public class MainActivity extends AppCompatActivity {
             });
 
             //Get egcodes.speedtest hosts
-            int timeCount = 600; //1min
+            final long startTime = System.currentTimeMillis();
             while (!mGetSpeedTestHostsHandler.isFinished()) {
-                timeCount--;
+                //最好改为postDelay
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                 }
-                if (timeCount <= 0) {
+                //0.1s测试一次，如果1min内没有完成，则输出没有连接
+                if (System.currentTimeMillis() - startTime >= 60000) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -526,7 +558,7 @@ public class MainActivity extends AppCompatActivity {
         return 0;
     }
 
-    private Looper startNewThread(String threadName, Runnable runnable){
+    private Looper startNewThread(String threadName, Runnable runnable) {
         HandlerThread thread = new HandlerThread(threadName);
         thread.start();
         Handler handler = new Handler(thread.getLooper());
@@ -534,7 +566,7 @@ public class MainActivity extends AppCompatActivity {
         return thread.getLooper();
     }
 
-    private void jniTest (){
+    private void jniTest() {
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
         final JavaUtils javaUtils = new JavaUtils();
@@ -546,6 +578,7 @@ public class MainActivity extends AppCompatActivity {
                 //String probeIP = "172.16.10.129";
                 String probeIP = "184.170.218.205";
                 javaUtils.init();
+
 
                 networkStatistic.lostrateAndRTT(javaUtils,probeIP);
                 networkStatistic.uploadBw(javaUtils,probeIP);
