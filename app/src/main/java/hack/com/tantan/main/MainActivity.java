@@ -1,4 +1,4 @@
-package hack.com.tantan;
+package hack.com.tantan.main;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -34,7 +34,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import hack.com.tantan.second.DetailActivity;
+import hack.com.tantan.GetSpeedTestHostsHandler;
+import hack.com.tantan.JavaUtils;
+import hack.com.tantan.R;
+import hack.com.tantan.main.contract.MainContractView;
+import hack.com.tantan.main.presenter.MainPresenter;
+import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.PingTest;
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
     private Button mGoToDetailButton = null;
+    private MainPresenter mPresenter = null;
     /**
      * 测试用进程的名称
      */
@@ -57,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //沉浸式状态栏
         Window window = getWindow();
-        //沉浸式导航栏
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary2));
@@ -78,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mGoToDetailButton = findViewById(R.id.btn_detail);
         mGoToDetailButton.setOnClickListener(this);
-
         //for jniTest
         jniTest();
     }

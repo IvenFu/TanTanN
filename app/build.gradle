@@ -45,6 +45,9 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13-beta-3'
     implementation files('libs/achartengine-1.2.0.jar')
+    implementation files('src/main/java/hack/com/tantan/jar/net-detector-sdk-0.0.1-SNAPSHOT.jar')
+    implementation 'com.alibaba:fastjson:1.2.58'
+    implementation 'com.alibaba:fastjson:1.1.71.android'
 }

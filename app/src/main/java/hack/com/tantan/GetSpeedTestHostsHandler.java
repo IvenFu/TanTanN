@@ -11,11 +11,11 @@ import java.util.List;
 
 public class GetSpeedTestHostsHandler extends Thread {
 
-    HashMap<Integer, String> mapKey = new HashMap<>();
-    HashMap<Integer, List<String>> mapValue = new HashMap<>();
-    double selfLat = 0.0;
-    double selfLon = 0.0;
-    boolean finished = false;
+    private HashMap<Integer, String> mapKey = new HashMap<>();
+    private HashMap<Integer, List<String>> mapValue = new HashMap<>();
+    private double selfLat = 0.0;
+    private double selfLon = 0.0;
+    private boolean finished = false;
 
 
     public HashMap<Integer, String> getMapKey() {
