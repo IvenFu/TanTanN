@@ -20,7 +20,10 @@ LOCAL_C_INCLUDES := networkTT.h \
 #                          libProbing
 
 LOCAL_LDLIBS := -lProbing -lm -llog
+
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/../../../libs/armeabi-v7a
-#LOCAL_LDLIBS += -L/Users/dir/Project/Hacker/tantan/app/libs/armeabi-v7a
+
+#LOCAL_LDLIBS += -L/Users/iven/Project/Hacker/tantan/app/libs/armeabi-v7a
+>>>>>>> 01ac90bf0332785ffd8fc1ac748841648669dc27
 
 include $(BUILD_SHARED_LIBRARY) #注明生成动态库
