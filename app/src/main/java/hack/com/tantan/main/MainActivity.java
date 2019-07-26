@@ -42,6 +42,7 @@ import hack.com.tantan.main.presenter.MainPresenter;
 import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
+import hack.com.tantan.test.NetworkStatistic;
 import hack.com.tantan.test.PingTest;
 
 
@@ -569,17 +570,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
         final JavaUtils javaUtils = new JavaUtils();
+        final NetworkStatistic networkStatistic = new NetworkStatistic();
 
         jniTest.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                //String probeIP = "172.16.10.129";
+                String probeIP = "184.170.218.205";
                 javaUtils.init();
-                String jniString = javaUtils.getString();
-                Log.i(TAG, "JNI test sucess " + jniString);
+
+
+                networkStatistic.lostrateAndRTT(javaUtils,probeIP);
+                networkStatistic.uploadBw(javaUtils,probeIP);
+                networkStatistic.downloadBw(javaUtils,probeIP);
+
                 javaUtils.uninit();
             }
         });
-
     }
+
 }
 

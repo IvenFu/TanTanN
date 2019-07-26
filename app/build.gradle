@@ -12,6 +12,7 @@ android {
 
         ndk {
             moduleName "JNISample"
+            abiFilters  "armeabi-v7a"
         }
 
     }

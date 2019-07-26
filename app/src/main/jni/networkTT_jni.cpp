@@ -57,23 +57,138 @@ JNIEXPORT void JNICALL Java_hack_com_tantan_JavaUtils_uninit
 }
 }
 
-
 extern "C" {
-JNIEXPORT jstring JNICALL Java_hack_com_tantan_JavaUtils_getString
-        (JNIEnv *env, jobject, jlong network){
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingLostrateAndRTT
+        (JNIEnv *env, jobject , jlong network, jstring probeIP){
 
     NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
     if (networkTT != nullptr) {
-        //std::string  ret = networkTT->getString();
 
-        char*  ret = networkTT->getString();
-        jstring j_str = env->NewStringUTF(ret);
+        const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
+        networkTT->Probing_Lostrate_And_RTT(charIP);
 
+        LOGD("ProbingLostrateAndRTT ");
 
-        LOGD("init ====");
-        return j_str ;
+        return 0;
     }
 
-    return nullptr;
+    LOGD("ProbingLostrateAndRTT failed" );
+
+    return -1;
+
+}
+}
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetRTT
+        (JNIEnv *env, jobject,jlong network){
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+
+        int retRTT = networkTT->Get_RTT();
+
+        LOGD("GetRTT ");
+
+        return retRTT;
+    }
+
+    LOGD("GetRTT failed ");
+
+    return -1;
+
+}
+}
+
+
+extern "C" {
+JNIEXPORT jfloat JNICALL Java_hack_com_tantan_JavaUtils_GetLossrate
+        (JNIEnv *env, jobject,jlong network){
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+
+        float retLossrate = networkTT->Get_Lossrate();
+
+        LOGD("GetLossrate ");
+
+        return retLossrate;
+    }
+
+    LOGD("GetLossrate failed ");
+
+    return -1;
+
+}
+}
+
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingUpBw
+        (JNIEnv *env, jobject, jlong network, jstring probeIP) {
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+        const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
+        networkTT->Probing_Up_Bw(charIP);
+    }
+
+    return  -1;
+}
+}
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetUpBw
+        (JNIEnv *env, jobject,jlong network){
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+
+        float retUpBW = networkTT->Get_Up_Bw();
+
+        LOGD("GetUpBw ");
+
+        return retUpBW;
+    }
+
+    LOGD("retUpBW failed ");
+
+    return -1;
+
+}
+}
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
+        (JNIEnv *env, jobject, jlong network, jstring probeIP) {
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+        const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
+        networkTT->Probing_Up_Bw(charIP);
+    }
+
+    return -1;
+}
+}
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetDownBw
+        (JNIEnv *env, jobject,jlong network){
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+
+        float retDownBW = networkTT->Get_Down_Bw();
+
+        LOGD("GetDownBw ");
+
+        return retDownBW;
+    }
+
+    LOGD("retDownBW failed ");
+
+    return -1;
+
 }
 }

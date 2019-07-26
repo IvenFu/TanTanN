@@ -8,10 +8,20 @@ LOCAL_MODULE    := libjnitest #生成so的名字，前面加lib
 LOCAL_SRC_FILES := networkTT_jni.cpp\
                    networkTT.cpp
 
-LOCAL_C_INCLUDES := networkTT.h
+LOCAL_C_INCLUDES := networkTT.h \
+                    probe.h
 
-#LOCAL_STATIC_LIBRARIES := libjson \
-#                           libjsoncpp
 
-LOCAL_LDLIBS := -lm -llog
+#LOCAL_PREBUILT_LIBS += libProbing:libs/armeabi-v7a/libProbing.so
+#LOCAL_MODULE_TAGS := optional
+#include $(BUILD_MULTI_PREBUILT)
+
+#LOCAL_SHARED_LIBRARIES := libNPQos \
+#                          libProbing
+
+
+LOCAL_LDLIBS := -lProbing -lm -llog
+
+LOCAL_LDLIBS += -L/Users/iven/Project/Hacker/tantan/app/libs/armeabi-v7a
+
 include $(BUILD_SHARED_LIBRARY) #注明生成动态库

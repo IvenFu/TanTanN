@@ -6,7 +6,7 @@
 
 #include  <android/log.h>
 #include <jni.h>
-#include <string>
+#include "probe.h"
 
 
 #define TAG    "Network"
@@ -14,7 +14,6 @@
 
 
 NetworkTT::NetworkTT() {
-    LOGD("NetworkTT");
 }
 
 NetworkTT::~NetworkTT() {
@@ -34,42 +33,59 @@ void NetworkTT::uninit() {
     return ;
 }
 
-char* NetworkTT::getString() {
-    LOGD("network getString");
-    char*  ret = " NetworkTT::getString()" ;
+int NetworkTT::Probing_Lostrate_And_RTT(const char* probeIP){
 
-    return ret ;
-}
-
-//ø™∆Ù∂™∞¸¬ RTTÃΩ≤‚
-int NetworkTT::ProbingLostrateAndRTT(){
-
+    char *ipChar = const_cast<char *> (probeIP);
+    ProbingLostrateAndRTT(ipChar);
     return 0;
 }
+unsigned int NetworkTT::Get_RTT(){
 
-//ªÒ»°Ω·π˚
-int NetworkTT::GetLostrateAndRTT(unsigned int* pRttMs, float* pfLossRate){
+    unsigned int  rtt = 0 ;
+    GetRTT(&rtt);
 
-    return 0;
+    LOGD("Get_RTT %d ", rtt) ;
+    return rtt ;
+}
+
+float NetworkTT::Get_Lossrate(){
+
+    float lossRate = 0;
+    GetLostrate(&lossRate);
+    return lossRate;
 }
 
 //ø™∆Ù…œ––¥¯øÌÃΩ≤‚
-int NetworkTT::ProbingUpBw(){
+int NetworkTT::Probing_Up_Bw(const char* probeIP){
+
+    char *ipChar = const_cast<char *> (probeIP);
+
+    ProbingUpBw(ipChar);
+
     return 0;
 }
 
 //ªÒ»°Ω·π˚
-int NetworkTT::GetUpBw(int* pBitrate){
+int NetworkTT::Get_Up_Bw(){
 
-    return 0;
+    int  upBw = 0;
+    GetUpBw(&upBw);
+    return upBw;
 }
 
 //ø™∆Ùœ¬––¥¯øÌÃΩ≤‚
-int NetworkTT::ProbingDownBw(){
+int NetworkTT::Probing_Down_Bw(const char* probeIP){
+
+    char *ipChar = const_cast<char *> (probeIP);
+
+    ProbingDownBw(ipChar);
+
     return 0;
 }
 
 //ªÒ»°Ω·π˚
-int NetworkTT::GetDownBw(int* pBitrate){
-    return 0;
+int NetworkTT::Get_Down_Bw(){
+    int  downBw = 0;
+    GetUpBw(&downBw);
+    return downBw;
 }
