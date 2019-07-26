@@ -21,7 +21,8 @@
         android:src="@mipmap/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/back" />
 
     <ImageButton
         android:id="@+id/btn_back"
@@ -152,5 +153,16 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_test"
+        style="@style/BottomButton"
+        android:layout_width="match_parent"
+        android:text="@string/test"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 </android.support.constraint.ConstraintLayout>
