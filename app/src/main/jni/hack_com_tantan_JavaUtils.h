@@ -9,11 +9,35 @@ extern "C" {
 #endif
 /*
  * Class:     hack_com_tantan_JavaUtils
+ * Method:    createNetwork
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_hack_com_tantan_JavaUtils_createNetwork
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    init
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_hack_com_tantan_JavaUtils_init
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    uninit
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_hack_com_tantan_JavaUtils_uninit
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
  * Method:    getString
- * Signature: ()Ljava/lang/String;
+ * Signature: (J)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_hack_com_tantan_JavaUtils_getString
-  (JNIEnv *, jclass);
+  (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
 }
