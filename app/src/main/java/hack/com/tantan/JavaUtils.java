@@ -5,11 +5,15 @@ import android.util.Log;
 
 public class JavaUtils {
 
-    private static final String TAG = "VideoNative";
+    private static final String TAG = "networkNative";
     private long nativeNetwork;
 
     static {
         System.loadLibrary("jnitest");
+    }
+
+    public  JavaUtils(){
+        createNativeNetwork();
     }
 
     public void  createNativeNetwork(){

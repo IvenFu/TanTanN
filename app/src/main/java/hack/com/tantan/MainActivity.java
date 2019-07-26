@@ -81,29 +81,8 @@ public class MainActivity extends AppCompatActivity {
         mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
         mGetSpeedTestHostsHandler.start();
 
-
-        mGoToDetailButton = findViewById(R.id.btn_detail);
-        mGoToDetailButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
-        });
-
-
-        final Button jniTest = (Button) findViewById(R.id.jniTest);
-
-        jniTest.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                String jniString = JavaUtils.getString();
-                Log.i(TAG,"JNI test sucess " + jniString);
-            }
-        });
-
-
-
+        //for jniTest
+        jniTest();
         mStartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mStartButton.setEnabled(false);
@@ -562,6 +541,23 @@ public class MainActivity extends AppCompatActivity {
         Handler handler = new Handler(thread.getLooper());
         handler.post(runnable);
         return thread.getLooper();
+    }
+
+    private void jniTest (){
+
+        final Button jniTest = (Button) findViewById(R.id.jniTest);
+        final JavaUtils javaUtils = new JavaUtils();
+
+        jniTest.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                javaUtils.init();
+                String jniString = javaUtils.getString();
+                Log.i(TAG,"JNI test sucess " + jniString);
+                javaUtils.uninit();
+            }
+        });
+
     }
 }
 
