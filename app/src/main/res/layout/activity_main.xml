@@ -156,7 +156,8 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
-                app:srcCompat="@mipmap/speedometer" />
+                app:srcCompat="@mipmap/speedometer"
+                android:contentDescription="@string/speedometer" />
 
 
             <ImageView
@@ -165,7 +166,8 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                app:srcCompat="@mipmap/bar" />
+                app:srcCompat="@mipmap/bar"
+                android:contentDescription="@string/speedometer" />
 
             <LinearLayout
                 android:layout_width="match_parent"

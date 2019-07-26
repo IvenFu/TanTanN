@@ -26,7 +26,7 @@ android {
     externalNativeBuild {
         //指定Android.mk文件
         ndkBuild {
-            path 'src/speedometer/jni/Android.mk'
+            path 'src/main/jni/Android.mk'
         }
     }
 

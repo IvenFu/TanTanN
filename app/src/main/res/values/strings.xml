@@ -3,7 +3,7 @@
     <string name="ping">PING</string>
     <string name="download">DOWNLOAD</string>
     <string name="upload">UPLOAD</string>
-    <string name="speed_table">速度表</string>
+    <string name="speedometer">速度表</string>
     <string name="prob">开始检测</string>
     <string name="details">详细数据</string>
     <string name="begin_test">Begin Test</string>
