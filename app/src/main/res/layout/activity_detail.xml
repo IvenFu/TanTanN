@@ -32,8 +32,8 @@
         app:layout_constraintStart_toStartOf="@id/img_logo"
         app:layout_constraintTop_toTopOf="@id/img_logo"
         app:layout_constraintBottom_toBottomOf="@id/img_logo"
-        android:layout_marginStart="11dp"
-        />
+        android:layout_marginStart="9dp"
+        android:contentDescription="@string/back" />
 
     <LinearLayout
         android:id="@+id/ll_data_table"

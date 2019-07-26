@@ -41,24 +41,18 @@ import hack.com.tantan.test.PingTest;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private final String TAG = "MainActivity";
     private static int mPosition = 0;
     private static int mLastPosition = 0;
     private GetSpeedTestHostsHandler mGetSpeedTestHostsHandler = null;
     private HashSet<String> mTempBlackList;
-    private final  String TAG = "MainActivity";
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
     private Button mGoToDetailButton = null;
-    /**测试用进程的名称*/
+    /**
+     * 测试用进程的名称
+     */
     private static final String PROB_THREAD_NAME = "ProbThread";
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        mGetSpeedTestHostsHandler.start();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         mStartButton = (Button) findViewById(R.id.btn_start);
+        mStartButton.setOnClickListener(this);
         mDec = new DecimalFormat("#.##");
 
         mStartButton.setText("Begin Test");
@@ -82,28 +77,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mGetSpeedTestHostsHandler.start();
 
         mGoToDetailButton = findViewById(R.id.btn_detail);
+        mGoToDetailButton.setOnClickListener(this);
 
         //for jniTest
         jniTest();
-        /*mStartButton.setOnClickListener(new View.OnClickListener() {{}
-            public void onClick(View v) {
-                mStartButton.setEnabled(false);
+    }
 
-                //Restart test icin eger baglanti koparsa
-                if (mGetSpeedTestHostsHandler == null) {
-                    mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-                    mGetSpeedTestHostsHandler.start();
-                }
+    @Override
+    public void onResume() {
+        super.onResume();
 
-                //开启新线程来执行检测操作
-                startNewThread(PROB_THREAD_NAME, new ProbRunnable());
-            }
-        });*/
+        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+        mGetSpeedTestHostsHandler.start();
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_start:
                 mStartButton.setEnabled(false);
 
@@ -118,18 +108,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_detail:
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                 MainActivity.this.startActivity(intent);
+                break;
+            default:
+                break;
         }
     }
 
     /**
      * 探测的Runnable
      */
-    class ProbRunnable implements Runnable{
+    class ProbRunnable implements Runnable {
         private RotateAnimation mRotate;
         private ImageView mBarImageView = (ImageView) findViewById(R.id.img_bar);
         private TextView mPingTextView = (TextView) findViewById(R.id.pingTextView);
         private TextView mDownloadTextView = (TextView) findViewById(R.id.downloadTextView);
         private TextView mUploadTextView = (TextView) findViewById(R.id.uploadTextView);
+
         @Override
         public void run() {
             runOnUiThread(new Runnable() {
@@ -140,14 +134,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
 
             //Get egcodes.speedtest hosts
-            int timeCount = 600; //1min
+            final long startTime = System.currentTimeMillis();
             while (!mGetSpeedTestHostsHandler.isFinished()) {
-                timeCount--;
+                //最好改为postDelay
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                 }
-                if (timeCount <= 0) {
+                //0.1s测试一次，如果1min内没有完成，则输出没有连接
+                if (System.currentTimeMillis() - startTime >= 60000) {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -557,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return 0;
     }
 
-    private Looper startNewThread(String threadName, Runnable runnable){
+    private Looper startNewThread(String threadName, Runnable runnable) {
         HandlerThread thread = new HandlerThread(threadName);
         thread.start();
         Handler handler = new Handler(thread.getLooper());
@@ -565,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return thread.getLooper();
     }
 
-    private void jniTest (){
+    private void jniTest() {
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
         final JavaUtils javaUtils = new JavaUtils();
@@ -575,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 javaUtils.init();
                 String jniString = javaUtils.getString();
-                Log.i(TAG,"JNI test sucess " + jniString);
+                Log.i(TAG, "JNI test sucess " + jniString);
                 javaUtils.uninit();
             }
         });
