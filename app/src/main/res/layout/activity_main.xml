@@ -182,12 +182,14 @@
                     android:id="@+id/btn_start"
                     style="@style/BottomButton"
                     android:layout_weight="1"
-                    android:text="@string/begin_test"/>
+                    android:text="@string/begin_test"
+                    android:onClick="onClick"/>
                 <Button
                     android:id="@+id/btn_detail"
                     style="@style/BottomButton"
                     android:layout_weight="1"
                     android:text="@string/details"
+                    android:onClick="onClick"
                     />
             </LinearLayout>
 

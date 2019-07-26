@@ -40,7 +40,7 @@ import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.PingTest;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static int mPosition = 0;
     private static int mLastPosition = 0;
     private GetSpeedTestHostsHandler mGetSpeedTestHostsHandler = null;
@@ -81,9 +81,11 @@ public class MainActivity extends AppCompatActivity {
         mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
         mGetSpeedTestHostsHandler.start();
 
+        mGoToDetailButton = findViewById(R.id.btn_detail);
+
         //for jniTest
         jniTest();
-        mStartButton.setOnClickListener(new View.OnClickListener() {
+        /*mStartButton.setOnClickListener(new View.OnClickListener() {{}
             public void onClick(View v) {
                 mStartButton.setEnabled(false);
 
@@ -96,7 +98,27 @@ public class MainActivity extends AppCompatActivity {
                 //开启新线程来执行检测操作
                 startNewThread(PROB_THREAD_NAME, new ProbRunnable());
             }
-        });
+        });*/
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_start:
+                mStartButton.setEnabled(false);
+
+                //Restart test icin eger baglanti koparsa
+                if (mGetSpeedTestHostsHandler == null) {
+                    mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
+                    mGetSpeedTestHostsHandler.start();
+                }
+                //开启新线程来执行检测操作
+                startNewThread(PROB_THREAD_NAME, new ProbRunnable());
+                break;
+            case R.id.btn_detail:
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                MainActivity.this.startActivity(intent);
+        }
     }
 
     /**
