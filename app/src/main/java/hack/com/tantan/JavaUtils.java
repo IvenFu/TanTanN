@@ -13,7 +13,7 @@ public class JavaUtils {
     }
 
     public  JavaUtils(){
-        createNativeNetwork();
+
     }
 
     public void  createNativeNetwork(){
@@ -22,7 +22,10 @@ public class JavaUtils {
         Log.d(TAG, "createNativeNetwork " + nativeNetwork);
     }
 
+
+
     public  void  init(){
+        createNativeNetwork();
         init(nativeNetwork);
     }
 
@@ -31,32 +34,52 @@ public class JavaUtils {
     }
 
 
-    public String getString(){
 
-        return getString(nativeNetwork);
+    public int probingLostrateAndRTT(String probeIP){
+        return ProbingLostrateAndRTT(nativeNetwork, probeIP);
     }
+    public float getLossrate(){
+        return GetLossrate(nativeNetwork);
+    }
+    public int getRTT(){
+        return GetRTT(nativeNetwork);
+    }
+
+    public int probingUpBw(String probeIP){
+        return ProbingUpBw(nativeNetwork,probeIP);
+    }
+
+    public int getUpBw(){
+        return GetUpBw(nativeNetwork);
+    }
+
+    public int probingDownBw(String probeIP){
+        return ProbingDownBw(nativeNetwork,probeIP);
+    }
+
+    public int getDownBw(){
+        return GetDownBw(nativeNetwork);
+    }
+
 
     private native  long createNetwork(long nativeNetwork);
     private native  void  init(long nativeNetwork);
     private native  void  uninit(long nativeNetwork);
 
-    private native  String  getString(long nativeNetwork);
+    public native int ProbingLostrateAndRTT(long nativeNetwork,String probeIP);
+    //float pfLossRate
+    public native float GetLossrate(long nativeNetwork);
+    //int pRttMs
+    public native  int  GetRTT(long nativeNetwork);
+    //String szServerIp
+    public native int ProbingUpBw(long nativeNetwor,String probeIP);
 
-    /*//ø™∆Ù∂™∞¸¬ RTTÃΩ≤‚
-    public native int ProbingLostrateAndRTT(nativeNetwork);
+    //int pBitrate
+    public native int GetUpBw(long nativeNetwork);
 
-    //ªÒ»°Ω·π˚
-    public native int GetLostrateAndRTT( nativeNetwork,int pRttMs, float pfLossRate);
+    //String szServerIp
+    public native int ProbingDownBw(long nativeNetwork,String probeIP);
 
-    //ø™∆Ù…œ––¥¯øÌÃΩ≤‚
-    public native int ProbingUpBw(nativeNetwork);
-
-    //ªÒ»°Ω·π˚
-    public native int GetUpBw(nativeNetwork,int pBitrate);
-
-    //ø™∆Ùœ¬––¥¯øÌÃΩ≤‚
-    public native int ProbingDownBw(nativeNetwork);
-
-    //ªÒ»°Ω·π˚
-    public native int GetDownBw(nativeNetwork,int pBitrate);*/
+    //int pBitrate
+    public native int GetDownBw(long nativeNetwork);
 }

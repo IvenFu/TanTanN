@@ -33,10 +33,58 @@ JNIEXPORT void JNICALL Java_hack_com_tantan_JavaUtils_uninit
 
 /*
  * Class:     hack_com_tantan_JavaUtils
- * Method:    getString
- * Signature: (J)Ljava/lang/String;
+ * Method:    ProbingLostrateAndRTT
+ * Signature: (JLjava/lang/String;)I
  */
-JNIEXPORT jstring JNICALL Java_hack_com_tantan_JavaUtils_getString
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingLostrateAndRTT
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    GetLostrate
+ * Signature: (J)F
+ */
+JNIEXPORT jfloat JNICALL Java_hack_com_tantan_JavaUtils_GetLossrate
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    GetRTT
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetRTT
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    ProbingUpBw
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingUpBw
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    GetUpBw
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetUpBw
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    ProbingDownBw
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    GetDownBw
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetDownBw
   (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus

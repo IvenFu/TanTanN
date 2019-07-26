@@ -5,8 +5,6 @@
 #ifndef TANTAN_PROBE_H
 #define TANTAN_PROBE_H
 
-#include <string>
-
 
 class NetworkTT {
 
@@ -21,22 +19,24 @@ public:
     char* getString();
 
     //ø™∆Ù∂™∞¸¬ RTTÃΩ≤‚
-    int ProbingLostrateAndRTT();
+    int Probing_Lostrate_And_RTT(const char * probIP);
 
-//ªÒ»°Ω·π˚
-    int GetLostrateAndRTT(unsigned int* pRttMs, float* pfLossRate);
+     unsigned  int Get_RTT();
+
+    float  Get_Lossrate();
+
 
 //ø™∆Ù…œ––¥¯øÌÃΩ≤‚
-    int ProbingUpBw();
+    int Probing_Up_Bw(const char * probIP);
 
 //ªÒ»°Ω·π˚
-    int GetUpBw(int* pBitrate);
+    int Get_Up_Bw();
 
 //ø™∆Ùœ¬––¥¯øÌÃΩ≤‚
-    int ProbingDownBw();
+    int Probing_Down_Bw(const char * probIP);
 
 //ªÒ»°Ω·π˚
-    int GetDownBw(int* pBitrate);
+    int Get_Down_Bw();
 
 };
 
