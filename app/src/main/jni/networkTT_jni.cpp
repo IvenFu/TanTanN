@@ -44,7 +44,14 @@ extern "C" {
 JNIEXPORT void JNICALL Java_hack_com_tantan_JavaUtils_uninit
         (JNIEnv *env, jobject, jlong network){
 
-    LOGD("uninit"," uninit " );
+
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+        networkTT->uninit();
+        LOGD("uninit ====");
+        delete  networkTT;
+    }
 
     return;
 }

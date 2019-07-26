@@ -37,6 +37,7 @@ void NetworkTT::uninit() {
 char* NetworkTT::getString() {
     LOGD("network getString");
     char*  ret = " NetworkTT::getString()" ;
+
     return ret ;
 }
 
