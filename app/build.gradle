@@ -51,6 +51,5 @@ dependencies {
     implementation files('libs/achartengine-1.2.0.jar')
     implementation files('src/main/java/hack/com/tantan/jar/net-detector-sdk-0.0.1-SNAPSHOT.jar')
     implementation 'com.alibaba:fastjson:1.2.58'
-    implementation 'com.alibaba:fastjson:1.1.71.android'
     implementation("com.squareup.okhttp3:okhttp:4.0.1")
 }
