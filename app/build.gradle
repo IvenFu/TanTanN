@@ -23,16 +23,16 @@ android {
     }
 
 
-    externalNativeBuild{
+    externalNativeBuild {
         //指定Android.mk文件
-        ndkBuild{
-            path 'src/main/jni/Android.mk'
+        ndkBuild {
+            path 'src/speedometer/jni/Android.mk'
         }
     }
 
     //生成so到指定路径下
-    sourceSets{
-        main{
+    sourceSets {
+        main {
             jni.srcDirs = []
             jniLibs.srcDirs = ['libs']
         }
@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })

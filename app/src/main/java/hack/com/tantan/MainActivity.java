@@ -1,11 +1,11 @@
 package hack.com.tantan;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import hack.com.tantan.second.DetailActivity;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.PingTest;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private final  String TAG = "MainActivity";
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
+    private Button mGoToDetailButton = null;
     /**测试用进程的名称*/
     private static final String PROB_THREAD_NAME = "ProbThread";
 
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        mStartButton = (Button) findViewById(R.id.startButton);
+        mStartButton = (Button) findViewById(R.id.btn_start);
         mDec = new DecimalFormat("#.##");
 
         mStartButton.setText("Begin Test");
@@ -78,6 +80,16 @@ public class MainActivity extends AppCompatActivity {
 
         mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
         mGetSpeedTestHostsHandler.start();
+
+
+        mGoToDetailButton = findViewById(R.id.btn_detail);
+        mGoToDetailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
 
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
@@ -113,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
      */
     class ProbRunnable implements Runnable{
         private RotateAnimation mRotate;
-        private ImageView mBarImageView = (ImageView) findViewById(R.id.barImageView);
+        private ImageView mBarImageView = (ImageView) findViewById(R.id.img_bar);
         private TextView mPingTextView = (TextView) findViewById(R.id.pingTextView);
         private TextView mDownloadTextView = (TextView) findViewById(R.id.downloadTextView);
         private TextView mUploadTextView = (TextView) findViewById(R.id.uploadTextView);

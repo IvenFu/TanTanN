@@ -11,4 +11,22 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <!--android:background="@color/textColor2"
+                    android:elevation="0dp"
+                    android:shadowRadius="15"
+                    android:text="Begin Test"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="16sp"-->
+    <style name="BottomButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:background">@color/textColor2</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:shadowRadius">15</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/background_light</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>
