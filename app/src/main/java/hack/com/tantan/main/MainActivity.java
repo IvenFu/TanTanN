@@ -3,12 +3,14 @@ package hack.com.tantan.main;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telecom.Call;
+
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -38,9 +40,12 @@ import java.util.List;
 import hack.com.tantan.GetSpeedTestHostsHandler;
 import hack.com.tantan.JavaUtils;
 import hack.com.tantan.R;
+import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.main.contract.MainContractView;
 import hack.com.tantan.main.presenter.MainPresenter;
+
 import hack.com.tantan.detail.DetailActivity;
+
 import hack.com.tantan.test.CallbackBase;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
