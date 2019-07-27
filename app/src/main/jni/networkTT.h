@@ -38,6 +38,10 @@ public:
 //ªÒ»°Ω·π˚
     int Get_Down_Bw();
 
+    int Probing_Down_Lossrate(const char* probeIP);
+
+    float Get_Down_Lossrate();
+
 };
 
 #endif //TANTAN_PROBE_H

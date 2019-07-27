@@ -89,3 +89,19 @@ int NetworkTT::Get_Down_Bw(){
     GetUpBw(&downBw);
     return downBw;
 }
+
+int NetworkTT::Probing_Down_Lossrate(const char* probeIP){
+    char *ipChar = const_cast<char *> (probeIP);
+
+    ProbingDownLostrate(ipChar);
+
+    return 0;
+}
+
+float NetworkTT::Get_Down_Lossrate(){
+    float  downLossrate = 0;
+
+    GetDownLostrate(&downLossrate);
+    return downLossrate;
+}
+

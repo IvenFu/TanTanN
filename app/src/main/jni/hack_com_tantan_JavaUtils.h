@@ -41,10 +41,10 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingLostrateAndRTT
 
 /*
  * Class:     hack_com_tantan_JavaUtils
- * Method:    GetLostrate
+ * Method:    GetLossrate
  * Signature: (J)F
  */
-JNIEXPORT jfloat JNICALL Java_hack_com_tantan_JavaUtils_GetLostrate
+JNIEXPORT jfloat JNICALL Java_hack_com_tantan_JavaUtils_GetLossrate
   (JNIEnv *, jobject, jlong);
 
 /*
@@ -85,6 +85,22 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
  * Signature: (J)I
  */
 JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetDownBw
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    ProbingDownLostrate
+ * Signature: (JLjava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownLossrate
+  (JNIEnv *, jobject, jlong, jstring);
+
+/*
+ * Class:     hack_com_tantan_JavaUtils
+ * Method:    GetDownLostrate
+ * Signature: (J)F
+ */
+JNIEXPORT jfloat JNICALL Java_hack_com_tantan_JavaUtils_GetDownLossrate
   (JNIEnv *, jobject, jlong);
 
 #ifdef __cplusplus
