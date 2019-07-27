@@ -1,7 +1,6 @@
 package hack.com.tantan.main;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -21,14 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.netease.net.detector.sdk.config.ConfigService;
-import com.netease.net.detector.sdk.exception.NetDetectorException;
-
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,9 +40,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private final String TAG = "MainActivity";
     private static int mPosition = 0;
     private static int mLastPosition = 0;
-    private HashSet<String> mTempBlackList;
     private Button mStartButton = null;
-    private DecimalFormat mDec = null;
     private Button mGoToDetailButton = null;
     private ImageView mBarImageView = null;
     private TextView mRttTV = null;
@@ -61,11 +53,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private LinearLayout mUploadBwLL = null;
     private MainPresenter mPresenter = null;
     private RotateAnimation mRotate;
-
-    /**
-     * 测试用进程的名称
-     */
-    private static final String PROB_THREAD_NAME = "ProbThread";
 
     final List<Double> downLossRateList = new ArrayList<>();
 
@@ -98,19 +85,11 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
         setContentView(R.layout.activity_main);
         findView();
-
-        mDec = new DecimalFormat("#.##");
-        mTempBlackList = new HashSet<>();
         mStartButton.setOnClickListener(this);
         mStartButton.setText("Begin Test");
 
         mGoToDetailButton.setOnClickListener(this);
-
-//        mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//        mRotate.setInterpolator(new LinearInterpolator());
-//        mRotate.setDuration(100);
-//        mBarImageView.startAnimation(mRotate);
-
+        networkUpdate();
     }
 
     private void findView() {
@@ -215,74 +194,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             }
         });
 
-    }
-
-    private void initPingGraphic(final XYMultipleSeriesRenderer multiPingRenderer) {
-
-        XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        pingFill.setColor(Color.parseColor("#4d5a6a"));
-        pingRenderer.addFillOutsideLine(pingFill);
-        pingRenderer.setDisplayChartValues(false);
-        pingRenderer.setShowLegendItem(false);
-        pingRenderer.setColor(Color.parseColor("#4d5a6a"));
-        pingRenderer.setLineWidth(5);
-        //final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
-        multiPingRenderer.setXLabels(0);
-        multiPingRenderer.setYLabels(0);
-        multiPingRenderer.setZoomEnabled(false);
-        multiPingRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiPingRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiPingRenderer.setPanEnabled(true, true);
-        multiPingRenderer.setZoomButtonsVisible(false);
-        multiPingRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiPingRenderer.addSeriesRenderer(pingRenderer);
-    }
-
-    private void initDownloadBwGraphic(final XYMultipleSeriesRenderer multiDownloadRenderer) {
-        //Init Download graphic
-        XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        downloadFill.setColor(Color.parseColor("#4d5a6a"));
-        downloadRenderer.addFillOutsideLine(downloadFill);
-        downloadRenderer.setDisplayChartValues(false);
-        downloadRenderer.setColor(Color.parseColor("#4d5a6a"));
-        downloadRenderer.setShowLegendItem(false);
-        downloadRenderer.setLineWidth(5);
-        //final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
-        multiDownloadRenderer.setXLabels(0);
-        multiDownloadRenderer.setYLabels(0);
-        multiDownloadRenderer.setZoomEnabled(false);
-        multiDownloadRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiDownloadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiDownloadRenderer.setPanEnabled(false, false);
-        multiDownloadRenderer.setZoomButtonsVisible(false);
-        multiDownloadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiDownloadRenderer.addSeriesRenderer(downloadRenderer);
-
-    }
-
-
-    private void initUploadBwGraphic(final XYMultipleSeriesRenderer multiUploadRenderer) {
-        //Init Upload graphic
-        XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        uploadFill.setColor(Color.parseColor("#4d5a6a"));
-        uploadRenderer.addFillOutsideLine(uploadFill);
-        uploadRenderer.setDisplayChartValues(false);
-        uploadRenderer.setColor(Color.parseColor("#4d5a6a"));
-        uploadRenderer.setShowLegendItem(false);
-        uploadRenderer.setLineWidth(5);
-        //f = new XYMultipleSeriesRenderer();
-        multiUploadRenderer.setXLabels(0);
-        multiUploadRenderer.setYLabels(0);
-        multiUploadRenderer.setZoomEnabled(false);
-        multiUploadRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiUploadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiUploadRenderer.setPanEnabled(false, false);
-        multiUploadRenderer.setZoomButtonsVisible(false);
-        multiUploadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiUploadRenderer.addSeriesRenderer(uploadRenderer);
     }
 
     private int getPositionByRate(double rate) {
@@ -444,8 +355,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             });
         }
 
-
-
         private int getPositionByRate(double rate) {
             if (rate <= 1) {
                 return (int) (rate * 30);
@@ -462,7 +371,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             } else if (rate <= 100) {
                 return (int) ((rate - 50) * 1.2) + 180;
             }
-
             return 0;
         }
 
