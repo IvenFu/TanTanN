@@ -1,46 +1,28 @@
 package hack.com.tantan.detail;
 
 import android.content.res.Resources;
-import android.support.annotation.IntDef;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.netease.net.detector.sdk.ping.PingInfo;
-import com.netease.net.detector.sdk.report.ReportStats;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.widget.Toast;
 
 import hack.com.tantan.R;
 import hack.com.tantan.detail.contract.DetailContractView;
 import hack.com.tantan.detail.presenter.DetailPresenter;
-import hack.com.tantan.utils.ServiceDataHandler;
 
 public class DetailActivity extends AppCompatActivity implements DetailContractView, View.OnClickListener {
     private ImageButton mBackBtn = null;
     private Button mTestBtn = null;
     private DetailPresenter mPresenter = null;
-    private LinearLayout mPingLL = null;
-
-    public static final int DETAIL_TYPE_PING = 0;
-    public static final int DETAIL_TYPE_TELNET = 1;
-    public static final int DETAIL_TYPE_DIG = 2;
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({DETAIL_TYPE_PING, DETAIL_TYPE_TELNET, DETAIL_TYPE_DIG})
-    @interface DetailType {
-    }
+    private LinearLayout mDetectResultLL = null;
+    private TextView mDetectingTV = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +45,8 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         mBackBtn.setOnClickListener(this);
         mTestBtn = findViewById(R.id.btn_test);
         mTestBtn.setOnClickListener(this);
-        mPingLL = findViewById(R.id.ll_ping);
+        mDetectResultLL = findViewById(R.id.ll_ping);
+        mDetectingTV = findViewById(R.id.tv_detecting);
     }
 
     @Override
@@ -80,26 +63,34 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         }
     }
 
-
     @Override
-    public void displayReportStats(final ReportStats stats) {
+    public void printDetecting(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                displayPing(stats.getPingInfoList());
+                mDetectingTV.setText(text);
             }
         });
     }
 
-    private void displayPing(List<PingInfo> pingInfoList) {
-        for (PingInfo info : pingInfoList) {
-            String host = info.getHost();
-            //丢包率
-            double loss = info.getLoss();
-            String rttStr = ServiceDataHandler.castRttToString(info.getRtt());
-            ArrayList<String> textList = new ArrayList<>(Arrays.asList(host, loss + "", rttStr));
-            addNewInfo(textList, mPingLL);
-        }
+    @Override
+    public void addDetectResult(final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mDetectResultLL.addView(newInfoTv(text));
+            }
+        });
+    }
+
+    @Override
+    public void onError(final Exception e) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "获取失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private TextView newInfoTv(String text) {
@@ -108,43 +99,8 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         textView.setTextColor(resources.getColor(R.color.white));
         textView.setTextSize(resources.getDimension(R.dimen.activity_detail_info_value));
         textView.setText(text);
-        textView.setMaxEms(25);
+//        textView.setFocusable(true);
+//        textView.setFocusableInTouchMode(true);
         return textView;
-    }
-
-    //新建一条分割线
-    private void setLineStyle(View line, LinearLayout parent) {
-        ViewGroup.LayoutParams parentParams = parent.getLayoutParams();
-        ViewGroup.LayoutParams lineParams = line.getLayoutParams();
-        lineParams.width = parentParams.width;
-        lineParams.height = 1;
-        line.setLayoutParams(lineParams);
-        line.setBackgroundColor(getResources().getColor(R.color.white));
-    }
-
-    private void addNewInfo(List<String> textList, LinearLayout parent) {
-        int parentWidth = parent.getLayoutParams().width;
-        LinearLayout newLineParent = new LinearLayout(getApplicationContext());
-        parent.addView(newLineParent);
-        newLineParent.setOrientation(LinearLayout.HORIZONTAL);
-        ViewGroup.LayoutParams newLineParentParams = newLineParent.getLayoutParams();
-        newLineParentParams.width = parentWidth;
-        newLineParentParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        newLineParent.setLayoutParams(newLineParentParams);
-
-        for (String text : textList) {
-//        for (int i=0; i< 3; ++i) {
-            TextView textView = newInfoTv(text);
-            newLineParent.addView(textView);
-//            textView.setText("ahskedfhosa");
-//            ViewGroup.LayoutParams layoutParams = textView.getLayoutParams();
-//            layoutParams.width = parentWidth / textList.size();
-//            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//            textView.setLayoutParams(layoutParams);
-        }
-
-        View line = new View(getApplicationContext());
-        parent.addView(line);
-        setLineStyle(line, parent);
     }
 }

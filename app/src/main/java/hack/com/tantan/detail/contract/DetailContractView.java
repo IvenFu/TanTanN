@@ -1,8 +1,10 @@
 package hack.com.tantan.detail.contract;
 
-import com.netease.net.detector.sdk.report.ReportStats;
-
 public interface DetailContractView {
-    //将ReportStats呈现倒界面
-    void displayReportStats(final ReportStats stats);
+
+    void printDetecting(final String text);
+
+    void addDetectResult(final String text);
+
+    void onError(final Exception e);
 }
