@@ -2,9 +2,6 @@ package hack.com.tantan.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,11 +14,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.netease.net.detector.sdk.config.ConfigService;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +33,10 @@ import hack.com.tantan.utils.XYMultipleSeriesRendererHandler;
 
 public class MainActivity extends AppCompatActivity implements MainContractView, View.OnClickListener {
     private final String TAG = "MainActivity";
+    private static final int HEART_BEAT = 500;
+    private static final int HEART_BEAT_COUNT = 10;
+    private static final String PROBE_IP = "184.170.218.205";
+
     private static int mPosition = 0;
     private static int mLastPosition = 0;
     private Button mStartButton = null;
@@ -54,10 +53,9 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private MainPresenter mPresenter = null;
     private RotateAnimation mRotate;
 
-    final List<Double> downLossRateList = new ArrayList<>();
-
-    final List<Double> uploadBwList = new ArrayList<>();
-    final List<Double> downloadBwList = new ArrayList<>();
+    private final List<Double> mDownLossRateList = new ArrayList<>();
+    private final List<Double> mUploadBwList = new ArrayList<>();
+    private final List<Double> mDownloadBwList = new ArrayList<>();
 
     public static double mUploadBw;
     public static double mDownloadBw;
@@ -65,18 +63,14 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     public static double mUploadLossRate;
     public static double mRtt;
 
-    final List<Double> rttList = new ArrayList<>();
-    final List<Double> mUploadRateLossList = new ArrayList<>();
-
-
-    int getDownloadBwCount = 0 ;
-    int heartBeat = 500;
-    int hearBeatCount = 10;
-    String probeIP = "184.170.218.205";
+    private final List<Double> mRttList = new ArrayList<>();
+    private final List<Double> mUploadRateLossList = new ArrayList<>();
+    private int mGetDownloadBwCount = 0 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPresenter = new MainPresenter(this);
         //沉浸式状态栏
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -89,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         mStartButton.setText("Begin Test");
 
         mGoToDetailButton.setOnClickListener(this);
-        networkUpdate();
     }
 
     private void findView() {
@@ -122,108 +115,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         }
     }
 
-    @Override
-    public void onSelectingBaseServer() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mStartButton.setText("Selecting best server based on ping...");
-            }
-        });
-    }
-
-    @Override
-    public void onNoConnection() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), "No Connection...", Toast.LENGTH_LONG).show();
-                mStartButton.setEnabled(true);
-                mStartButton.setTextSize(16);
-                mStartButton.setText("Restart Test");
-            }
-        });
-    }
-
-    @Override
-    public void onGetHostLocationFailed() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mStartButton.setTextSize(12);
-                mStartButton.setText("There was a problem in getting Host Location. Try again later.");
-            }
-        });
-    }
-
-    @Override
-    public void onGetHostLocation(final String location, final double distance) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mStartButton.setTextSize(13);
-                mStartButton.setText(String.format("Host Location: %s [Distance: %s km]", location, new DecimalFormat("#.##").format(distance / 1000)));
-            }
-        });
-
-    }
-
-    @Override
-    public void reset() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBarImageView = findViewById(R.id.img_bar);
-                mLossRateTV.setText("0 ms");
-                mLossRateLL.removeAllViews();
-                mDownloadBwTV.setText("0 Mbps");
-                mDownloadBwLL.removeAllViews();
-                mUploadBwTV.setText("0 Mbps");
-                mUploadBwLL.removeAllViews();
-            }
-        });
-
-    }
-
-    @Override
-    public void onPingTestFinished() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
-
-    }
-
-    private int getPositionByRate(double rate) {
-        if (rate <= 1) {
-            return (int) (rate * 30);
-
-        } else if (rate <= 10) {
-            return (int) (rate * 6) + 30;
-
-        } else if (rate <= 30) {
-            return (int) ((rate - 10) * 3) + 90;
-
-        } else if (rate <= 50) {
-            return (int) ((rate - 30) * 1.5) + 150;
-
-        } else if (rate <= 100) {
-            return (int) ((rate - 50) * 1.2) + 180;
-        }
-
-        return 0;
-    }
-
-    private Looper startNewThread(String threadName, Runnable runnable) {
-        HandlerThread thread = new HandlerThread(threadName);
-        thread.start();
-        Handler handler = new Handler(thread.getLooper());
-        handler.post(runnable);
-        return thread.getLooper();
-    }
-
     private void networkUpdate() {
 
         final JavaUtils javaUtils = new JavaUtils();
@@ -232,13 +123,13 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         Callback callback = new Callback();
 
 
-        final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat, hearBeatCount, callback);
+        final NetworkStatistic networkStatistic = new NetworkStatistic(HEART_BEAT, HEART_BEAT_COUNT, callback);
 
         try {
             String ip = new ConfigService().get().getQosList().get(0);
             networkStatistic.setProbeIP(ip);
         } catch (Exception e) {
-            networkStatistic.setProbeIP(probeIP);
+            networkStatistic.setProbeIP(PROBE_IP);
         }
 
         networkStatistic.lostrateAndRTT(javaUtils);
@@ -256,21 +147,21 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    rttList.add((double) rtt);
+                    mRttList.add((double) rtt);
 
                     Double sum = 0.0;
                     double rtt_ = 0.0;
-                    for(Double val:rttList){
+                    for(Double val: mRttList){
                         sum += val;
                     }
 
-                    if(rttList.size() != 0) {
-                        rtt_ = sum / rttList.size();
+                    if(mRttList.size() != 0) {
+                        rtt_ = sum / mRttList.size();
                     }
 
                     mRttTV.setText(String.format(Locale.CHINA, "%.2f Ms", (double) rtt_));
                     mRttLL.removeAllViews();
-                    mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
+                    mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(mRttList, getBaseContext()));
                     mRtt = rtt_;
 
                     mUploadRateLossList.add((double) uploadLoss);
@@ -291,21 +182,21 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 public void run() {
                     double upBandWidth = upBw / 1024.0 / 1024;
 
-                    uploadBwList.add((double) upBandWidth);
+                    mUploadBwList.add((double) upBandWidth);
 
                     Double sum = 0.0;
                     double upBw = 0.0;
-                    for(Double val:uploadBwList){
+                    for(Double val: mUploadBwList){
                         sum += val;
                     }
 
-                    if(uploadBwList.size() != 0) {
-                        upBw = sum / uploadBwList.size();
+                    if(mUploadBwList.size() != 0) {
+                        upBw = sum / mUploadBwList.size();
                     }
 
                     mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) upBw));
                     mUploadBwLL.removeAllViews();
-                    mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
+                    mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(mUploadBwList, getBaseContext()));
                     mUploadBw=upBw;
 
                     mPosition = getPositionByRate(upBandWidth);
@@ -328,19 +219,19 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
                     double downBandWidth = downBw / 1024.0 / 1024;
 
-                    downloadBwList.add(downBandWidth);
+                    mDownloadBwList.add(downBandWidth);
 
                     Double sum = 0.0;
-                    for(Double val:downloadBwList){
+                    for(Double val: mDownloadBwList){
                         sum += val;
                     }
-                    if(downloadBwList.size() != 0) {
-                        downBandWidth = sum / downloadBwList.size();
+                    if(mDownloadBwList.size() != 0) {
+                        downBandWidth = sum / mDownloadBwList.size();
                     }
 
                     mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) downBandWidth));
                     mDownloadBwLL.removeAllViews();
-                    mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downloadBwList, getBaseContext()));
+                    mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(mDownloadBwList, getBaseContext()));
                     mDownloadBw = downBandWidth;
 
                     mPosition = getPositionByRate(downBandWidth);
@@ -379,31 +270,31 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             Log.i(TAG, "onDownloadLossCallback  " + downloadLoss);
 
             synchronized (this) {
-                getDownloadBwCount++;
+                mGetDownloadBwCount++;
             }
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    downLossRateList.add((double) downloadLoss);
+                    mDownLossRateList.add((double) downloadLoss);
 
                     Double sum = 0.0;
                     double dnLossRate = 0;
-                    for(Double val:downLossRateList){
+                    for(Double val: mDownLossRateList){
                         sum += val;
                     }
 
-                    if(downLossRateList.size() != 0) {
-                        dnLossRate = sum / downLossRateList.size();
+                    if(mDownLossRateList.size() != 0) {
+                        dnLossRate = sum / mDownLossRateList.size();
                     }
 
                     mLossRateTV.setText(String.format(Locale.CHINA, "%.2f", (double) dnLossRate));
                     mLossRateLL.removeAllViews();
-                    mLossRateLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downLossRateList, getBaseContext()));
+                    mLossRateLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(mDownLossRateList, getBaseContext()));
                     mDownLossRate = dnLossRate;
 
                     synchronized (this) {
-                        if (getDownloadBwCount >= hearBeatCount) {
+                        if (mGetDownloadBwCount >= HEART_BEAT_COUNT) {
                             mStartButton.setEnabled(true);
                         }
                     }

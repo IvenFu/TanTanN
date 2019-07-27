@@ -30,7 +30,7 @@ public class XYMultipleSeriesRendererHandler {
         multiPingRenderer.setZoomEnabled(false);
         multiPingRenderer.setXAxisColor(Color.parseColor("#647488"));
         multiPingRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiPingRenderer.setPanEnabled(true, true);
+        multiPingRenderer.setPanEnabled(false, false);
         multiPingRenderer.setZoomButtonsVisible(false);
         multiPingRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
         multiPingRenderer.addSeriesRenderer(render);

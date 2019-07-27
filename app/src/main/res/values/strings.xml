@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">Thunder Speed Test</string>
-    <string name="ping">PING</string>
-    <string name="download">DOWNLOAD</string>
-    <string name="upload">UPLOAD</string>
-    <string name="speedometer">speedometer</string>
-    <string name="prob">probing</string>
-    <string name="details">details</string>
+    <string name="app_name">网络探探</string>
+    <string name="ping">Ping</string>
+    <string name="download">Download</string>
+    <string name="upload">Upload</string>
+    <string name="speedometer">Speedometer</string>
+    <string name="prob">Probing</string>
+    <string name="details">Details</string>
     <string name="begin_test">Begin Test</string>
-    <string name="back">back</string>
-    <string name="test">test</string>
+    <string name="back">Back</string>
+    <string name="test">Test</string>
 </resources>
