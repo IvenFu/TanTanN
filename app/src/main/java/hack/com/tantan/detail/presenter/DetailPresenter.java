@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hack.com.tantan.detail.contract.DetailContractView;
+import hack.com.tantan.main.MainActivity;
 import hack.com.tantan.utils.ServiceDataHandler;
 
 public class DetailPresenter {
@@ -50,12 +51,13 @@ public class DetailPresenter {
                     ReportStats reportStats = task.getCurrentReportStats();
                     List<QosInfo> qosInfoList = new ArrayList<>();
                     QosInfo qosInfo = new QosInfo();
-                    qosInfo.setHost("");
-                    qosInfo.setRtt(1);
-                    qosInfo.setDownloadBandwidth(1);
-                    qosInfo.setDownloadLossRate(0.0);
-                    qosInfo.setUploadBandwidth(1);
-                    qosInfo.setUploadLossRate(0.0);
+                    qosInfo.setHost(config.getQosList().get(0));
+                    qosInfo.setRtt((long) MainActivity.mRtt);
+                    qosInfo.setDownloadBandwidth((long) MainActivity.mDownloadBw);
+                    qosInfo.setDownloadLossRate(MainActivity.mDownLossRate);
+                    qosInfo.setUploadBandwidth((long) MainActivity.mUploadBw);
+                    qosInfo.setUploadLossRate(MainActivity.mUploadLossRate);
+                    qosInfoList.add(qosInfo);
                     reportStats.setQosInfoList(qosInfoList);
                     String reportId = task.report();
                     Log.e("@CJL/reportId", reportId);

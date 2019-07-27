@@ -20,6 +20,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.netease.net.detector.sdk.config.ConfigService;
+import com.netease.net.detector.sdk.exception.NetDetectorException;
+
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
@@ -69,7 +72,14 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     final List<Double> uploadBwList = new ArrayList<>();
     final List<Double> downloadBwList = new ArrayList<>();
 
+    public static double mUploadBw;
+    public static double mDownloadBw;
+    public static double mDownLossRate;
+    public static double mUploadLossRate;
+    public static double mRtt;
+
     final List<Double> rttList = new ArrayList<>();
+    final List<Double> mUploadRateLossList = new ArrayList<>();
 
 
     int getDownloadBwCount = 0 ;
@@ -313,7 +323,12 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
         final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat, hearBeatCount, callback);
 
-        networkStatistic.setProbeIP(probeIP);
+        try {
+            String ip = new ConfigService().get().getQosList().get(0);
+            networkStatistic.setProbeIP(ip);
+        } catch (Exception e) {
+            networkStatistic.setProbeIP(probeIP);
+        }
 
         networkStatistic.lostrateAndRTT(javaUtils);
         networkStatistic.downloadLossrate(javaUtils);
@@ -321,11 +336,11 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         networkStatistic.downloadBw(javaUtils);
     }
 
-    ///callback data from  NetworkStatistic
+    ///callback data from NetworkStatistic
     public class Callback implements CallbackBase {
 
         @Override
-        public void onRTTandUploadLossCallback(final int rtt, float uploadLoss) {
+        public void onRTTandUploadLossCallback(final int rtt, final float uploadLoss) {
             Log.i(TAG, "onRTTandUploadLossCallback uploadLoss " + uploadLoss + " rtt " + rtt);
             runOnUiThread(new Runnable() {
                 @Override
@@ -345,6 +360,14 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     mRttTV.setText(String.format(Locale.CHINA, "%.2f Ms", (double) rtt_));
                     mRttLL.removeAllViews();
                     mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
+                    mRtt = rtt_;
+
+                    mUploadRateLossList.add((double) uploadLoss);
+                    sum =0.0;
+                    for (double value : mUploadRateLossList){
+                        sum += value;
+                    }
+                    mUploadLossRate = sum / mUploadRateLossList.size();
                 }
             });
         }
@@ -372,6 +395,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) upBw));
                     mUploadBwLL.removeAllViews();
                     mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
+                    mUploadBw=upBw;
 
                     mPosition = getPositionByRate(upBandWidth);
                     mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -390,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     double downBandWidth = downBw / 1024.0 / 1024;
 
                     downloadBwList.add(downBandWidth);
@@ -405,6 +430,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) downBandWidth));
                     mDownloadBwLL.removeAllViews();
                     mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downloadBwList, getBaseContext()));
+                    mDownloadBw = downBandWidth;
 
                     mPosition = getPositionByRate(downBandWidth);
                     mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -466,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     mLossRateTV.setText(String.format(Locale.CHINA, "%.2f", (double) dnLossRate));
                     mLossRateLL.removeAllViews();
                     mLossRateLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downLossRateList, getBaseContext()));
+                    mDownLossRate = dnLossRate;
 
                     synchronized (this) {
                         if (getDownloadBwCount >= hearBeatCount) {
