@@ -1,13 +1,16 @@
 package hack.com.tantan.detail;
 
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,7 +22,6 @@ import hack.com.tantan.detail.presenter.DetailPresenter;
 
 public class DetailActivity extends AppCompatActivity implements DetailContractView, View.OnClickListener {
     private ImageButton mBackBtn = null;
-    private Button mTestBtn = null;
     private DetailPresenter mPresenter = null;
     private LinearLayout mDetectResultLL = null;
     private TextView mDetectingTV = null;
@@ -38,14 +40,27 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         setContentView(R.layout.activity_detail);
         //初始化Views
         initViews();
+
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.executeNetDetector();
+            }
+        }, 500);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        View mDecorView = getWindow().getDecorView();
+//        mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
     }
 
     private void initViews() {
         mBackBtn = findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
-        mTestBtn = findViewById(R.id.btn_test);
-        mTestBtn.setOnClickListener(this);
-        mDetectResultLL = findViewById(R.id.ll_ping);
+        mDetectResultLL = findViewById(R.id.ll_result);
         mDetectingTV = findViewById(R.id.tv_detecting);
     }
 
@@ -54,9 +69,6 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         switch (v.getId()) {
             case R.id.btn_back:
                 DetailActivity.this.finish();
-                break;
-            case R.id.btn_test:
-                mPresenter.executeNetDetector();
                 break;
             default:
                 break;
@@ -68,6 +80,9 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                ViewGroup.LayoutParams layoutParams = mDetectingTV.getLayoutParams();
+                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                mDetectingTV.setLayoutParams(layoutParams);
                 mDetectingTV.setText(text);
             }
         });
@@ -78,17 +93,29 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mDetectResultLL.addView(newInfoTv(text));
+                mDetectResultLL.addView(newInfoTv(text),
+                        mDetectResultLL.getChildCount() - 1);
             }
         });
     }
 
     @Override
-    public void onError(final Exception e) {
+    public void onDetectFinished() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), "获取失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                mDetectingTV.setText("探测完成");
+            }
+        });
+    }
+
+    @Override
+    public void onError(final String errorMessage) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_LONG).show();
+                addDetectResult(errorMessage);
             }
         });
     }
@@ -99,8 +126,6 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         textView.setTextColor(resources.getColor(R.color.white));
         textView.setTextSize(resources.getDimension(R.dimen.activity_detail_info_value));
         textView.setText(text);
-//        textView.setFocusable(true);
-//        textView.setFocusableInTouchMode(true);
         return textView;
     }
 }

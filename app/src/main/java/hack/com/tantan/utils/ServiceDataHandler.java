@@ -10,7 +10,6 @@ import com.netease.net.detector.sdk.ping.PingInfo;
 import com.netease.net.detector.sdk.telnet.TelnetInfo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ServiceDataHandler {
 
@@ -24,9 +23,10 @@ public class ServiceDataHandler {
     }
 
     public static String castPingInfoToString(PingInfo info) {
-        return "\n主机：" + info.getHost() +
-                "\n丢包率：" + info.getLoss() +
-                "\nRTT：" + castRttToString(info.getRtt());
+        return "Ping信息探测成功！" + "\n"
+                + "主机：" + info.getHost() + "\n"
+                + "丢包率：" + info.getLoss() + "\n"
+                + "RTT：" + castRttToString(info.getRtt()) + "\n";
     }
 
     private static String castRttToString(PingInfo.Rtt rtt) {
@@ -41,8 +41,9 @@ public class ServiceDataHandler {
     }
 
     public static String castTelnetInfoToString(TelnetInfo info) {
-        return "\n主机：" + info.getHost() +
-                "\n端口：" + info.getPort();
+        return "Telnet信息探测成功！" + "\n"
+                + "主机：" + info.getHost() + "\n"
+                + "端口：" + info.getPort() + "\n";
     }
 
     public static Bundle castDigInfo(DigInfo info) {
@@ -59,8 +60,9 @@ public class ServiceDataHandler {
             sb.append(ip).append(separator);
         }
 
-        return "\n主机：" + info.getHost() +
-                "\nIP列表" + sb.substring(0, sb.length() - separator.length());
+        return "Dig信息探测成功！" + "\n"
+                + "主机：" + info.getHost() + "\n"
+                + "IP列表" + sb.substring(0, sb.length() - separator.length()) + "\n";
     }
 
     public static Bundle castDnsInfo(DnsInfo info) {
@@ -71,8 +73,9 @@ public class ServiceDataHandler {
     }
 
     public static String castDnsInfoToString(DnsInfo info) {
-        return "\nDNS服务器地址：" + info.getDns() +
-                "\nDNS网关地址：" + info.getGateway();
+        return "DNS信息探测成功！" + "\n"
+                + "DNS服务器地址：" + info.getDns() + "\n"
+                + "DNS网关地址：" + info.getGateway() + "\n";
     }
 
     public static Bundle castIpInfo(IpInfo info) {
@@ -88,14 +91,15 @@ public class ServiceDataHandler {
     }
 
     public static String castIpInfoToString(IpInfo info) {
-        return "\n本机IP：" + info.getIp() +
-                "\n国家：" + info.getCountry() +
-                "\n省份：" + info.getProvince() +
-                "\n城市：" + info.getCarrier() +
-                "\n运营商：" + info.getCarrier() +
-                "\n经度：" + info.getLongitude() +
-                "\n纬度：" + info.getLatitude() +
-                "\n时区：" + info.getTimezone();
+        return "IP信息探测成功！" + "\n"
+                + "本机IP：" + info.getIp() + "\n"
+                + "国家：" + info.getCountry() + "\n"
+                + "省份：" + info.getProvince() + "\n"
+                + "城市：" + info.getCarrier() + "\n"
+                + "运营商：" + info.getCarrier() + "\n"
+                + "经度：" + info.getLongitude() + "\n"
+                + "纬度：" + info.getLatitude() + "\n"
+                + "时区：" + info.getTimezone() + "\n";
     }
 
     public static Bundle castIpv6Info(IPv6Info info) {
@@ -106,7 +110,14 @@ public class ServiceDataHandler {
     }
 
     public static String castIpv6InfoToString(IPv6Info info) {
-        return "\n本机IP：" + info.getIp() +
-                "\n是否支持：" + (info.isSupport() ? "支持" : "不支持");
+        StringBuilder sb = new StringBuilder();
+        sb.append("IPv6信息探测成功！\n");
+        if (info.isSupport()) {
+            sb.append("本机IPv6 IP：").append(info.getIp());
+        } else {
+            sb.append("本机不支持IPv6");
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 }

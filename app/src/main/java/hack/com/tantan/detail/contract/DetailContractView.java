@@ -6,5 +6,7 @@ public interface DetailContractView {
 
     void addDetectResult(final String text);
 
-    void onError(final Exception e);
+    void onError(final String errorMessage);
+
+    void onDetectFinished();
 }

@@ -16,71 +16,71 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorPrimary2"
+        android:contentDescription="@string/back"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
         android:src="@mipmap/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/back" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_back"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
-        android:src="@mipmap/back"
-        android:background="@color/transparent"
-        app:layout_constraintStart_toStartOf="@id/img_logo"
-        app:layout_constraintTop_toTopOf="@id/img_logo"
-        app:layout_constraintBottom_toBottomOf="@id/img_logo"
         android:layout_marginStart="9dp"
-        android:contentDescription="@string/back" />
-
-    <Button
-        android:id="@+id/btn_test"
-        style="@style/BottomButton"
-        android:layout_width="match_parent"
-        android:text="@string/test"
-        android:layout_height="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        android:background="@color/transparent"
+        android:contentDescription="@string/back"
+        android:src="@mipmap/back"
+        app:layout_constraintBottom_toBottomOf="@id/img_logo"
+        app:layout_constraintStart_toStartOf="@id/img_logo"
+        app:layout_constraintTop_toTopOf="@id/img_logo" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/img_logo"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        >
-        <LinearLayout
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/img_logo">
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="11dp"
-            android:layout_marginBottom="5dp"
             android:layout_marginStart="11dp"
+            android:layout_marginTop="11dp"
             android:layout_marginEnd="11dp"
+            android:layout_marginBottom="5dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_detecting"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="@string/ping"
-                android:textColor="@color/white"
-                android:textSize="21sp"
-                android:singleLine="true"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"
-                />
+                android:singleLine="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="21sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <LinearLayout
-                android:id="@+id/ll_ping"
+                android:id="@+id/ll_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_detecting">
 
-        </LinearLayout>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="200dp" />
+            </LinearLayout>
+
+        </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
