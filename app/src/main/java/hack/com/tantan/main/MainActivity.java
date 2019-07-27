@@ -2,15 +2,11 @@ package hack.com.tantan.main;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.telecom.Call;
-
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,33 +20,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.achartengine.ChartFactory;
-import org.achartengine.GraphicalView;
-import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
-import hack.com.tantan.GetSpeedTestHostsHandler;
 import hack.com.tantan.JavaUtils;
 import hack.com.tantan.R;
 import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.main.contract.MainContractView;
 import hack.com.tantan.main.presenter.MainPresenter;
-
-import hack.com.tantan.detail.DetailActivity;
-
 import hack.com.tantan.test.CallbackBase;
-import hack.com.tantan.test.HttpDownloadTest;
-import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.NetworkStatistic;
-import hack.com.tantan.test.PingTest;
 import hack.com.tantan.utils.XYMultipleSeriesRendererHandler;
 
 
@@ -58,32 +43,34 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private final String TAG = "MainActivity";
     private static int mPosition = 0;
     private static int mLastPosition = 0;
-    private GetSpeedTestHostsHandler mGetSpeedTestHostsHandler = null;
     private HashSet<String> mTempBlackList;
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
     private Button mGoToDetailButton = null;
     private ImageView mBarImageView = null;
-    private TextView mPingTextView = null;
-    private TextView mDownloadTextView = null;
-    private TextView mUploadTextView = null;
-    private LinearLayout mChartPing = null;
-    private LinearLayout mChartDownload = null;
-    private LinearLayout mChartUpload = null;
+    private TextView mRttTV = null;
+    private TextView mLossRateTV = null;
+    private TextView mDownloadBwTV = null;
+    private TextView mUploadBwTV = null;
+    private LinearLayout mRttLL = null;
+    private LinearLayout mLossRateLL = null;
+    private LinearLayout mDownloadBwLL = null;
+    private LinearLayout mUploadBwLL = null;
     private MainPresenter mPresenter = null;
+    private RotateAnimation mRotate;
+
     /**
      * 测试用进程的名称
      */
     private static final String PROB_THREAD_NAME = "ProbThread";
 
+    final List<Double> downLossRateList = new ArrayList<>();
 
-    final List<Float> upLossrateList = new ArrayList<>();
-    final List<Float> downLossrateList = new ArrayList<>();
+    final List<Double> uploadBwList = new ArrayList<>();
+    final List<Double> downloadBwList = new ArrayList<>();
 
-    final List<Integer> uploadBwList = new ArrayList<>();
-    final List<Integer> downloadBwList = new ArrayList<>();
+    final List<Double> rttList = new ArrayList<>();
 
-    final List<Integer> rttList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,31 +88,28 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         mStartButton.setOnClickListener(this);
         mStartButton.setText("Begin Test");
 
-        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        mGetSpeedTestHostsHandler.start();
         mGoToDetailButton.setOnClickListener(this);
 
-        jniTest();
+//        mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//        mRotate.setInterpolator(new LinearInterpolator());
+//        mRotate.setDuration(100);
+//        mBarImageView.startAnimation(mRotate);
+
+        networkUpdate();
     }
 
     private void findView() {
         mStartButton = findViewById(R.id.btn_start);
         mGoToDetailButton = findViewById(R.id.btn_detail);
         mBarImageView = findViewById(R.id.img_bar);
-        mPingTextView = findViewById(R.id.pingTextView);
-        mDownloadTextView = findViewById(R.id.downloadTextView);
-        mUploadTextView = findViewById(R.id.uploadTextView);
-        mChartPing = findViewById(R.id.chartPing);
-        mChartDownload = findViewById(R.id.chartDownload);
-        mChartUpload = findViewById(R.id.chartUpload);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-        mGetSpeedTestHostsHandler.start();
+        mRttTV = findViewById(R.id.tv_rtt);
+        mLossRateTV = findViewById(R.id.tv_dw_loss_rate_chart);
+        mDownloadBwTV = findViewById(R.id.tv_download);
+        mUploadBwTV = findViewById(R.id.tv_upload);
+        mRttLL = findViewById(R.id.ll_rtt_chart);
+        mLossRateLL = findViewById(R.id.ll_dw_loss_rate_chart);
+        mDownloadBwLL = findViewById(R.id.ll_download_chart);
+        mUploadBwLL = findViewById(R.id.ll_upload_chart);
     }
 
     @Override
@@ -133,14 +117,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         switch (v.getId()) {
             case R.id.btn_start:
                 mStartButton.setEnabled(false);
-
-                //Restart test icin eger baglanti koparsa
-                if (mGetSpeedTestHostsHandler == null) {
-                    mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
-                    mGetSpeedTestHostsHandler.start();
-                }
-                //开启新线程来执行检测操作
-                startNewThread(PROB_THREAD_NAME, new ProbRunnable());
+                networkUpdate();
                 break;
             case R.id.btn_detail:
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
@@ -203,12 +180,12 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
             @Override
             public void run() {
                 mBarImageView = findViewById(R.id.img_bar);
-                mPingTextView.setText("0 ms");
-                mChartPing.removeAllViews();
-                mDownloadTextView.setText("0 Mbps");
-                mChartDownload.removeAllViews();
-                mUploadTextView.setText("0 Mbps");
-                mChartUpload.removeAllViews();
+                mLossRateTV.setText("0 ms");
+                mLossRateLL.removeAllViews();
+                mDownloadBwTV.setText("0 Mbps");
+                mDownloadBwLL.removeAllViews();
+                mUploadBwTV.setText("0 Mbps");
+                mUploadBwLL.removeAllViews();
             }
         });
 
@@ -225,448 +202,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     }
 
-    class UpdateRunnable implements  Runnable{
-
-        @Override
-        public void run() {
-            ///button upload
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mStartButton.setText("Selecting best server based on ping...");
-                }
-            });
-
-            //create chart;
-            final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
-            initPingGraphic(multiPingRenderer);
-            final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
-            initDownloadBwGraphic(multiDownloadRenderer);
-            final XYMultipleSeriesRenderer multiUploadRenderer = new XYMultipleSeriesRenderer();
-            initUploadBwGraphic(multiUploadRenderer);
-
-            //Reset value, graphics
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mPingTextView.setText("0 ms");
-                    mChartPing.removeAllViews();
-                    mDownloadTextView.setText("0 Mbps");
-                    mChartDownload.removeAllViews();
-                    mUploadTextView.setText("0 Mbps");
-                    mChartUpload.removeAllViews();
-                }
-            });
-
-            jniTest();
-   /*         final JavaUtils javaUtils = new JavaUtils();
-            javaUtils.createNativeNetwork();
-
-            int heartBeat = 500;
-            int hearBeatCount = 20;
-            Callback callback = new Callback();
-            String probeIP = "184.170.218.205";
-
-            final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
-
-            networkStatistic.lostrateAndRTT(javaUtils,probeIP);*/
-
-            for(int i= 0;i<10; i++){
-                //Update chart
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Creating an  XYSeries for Income
-                        XYSeries pingSeries = new XYSeries("");
-                        pingSeries.setTitle("");
-
-                        int count = 0;
-                        List<Integer> tmpLs = new ArrayList<>(uploadBwList);
-                        for (Integer val : tmpLs) {
-                            pingSeries.add(count++, val);
-                        }
-
-                        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-                        dataset.addSeries(pingSeries);
-
-                        GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiPingRenderer);
-                        mChartPing.addView(chartView, 0);
-
-                    }
-                });
-            }
-
-        }
-    }
-
-
-    /**
-     * 探测的Runnable
-     */
-    class ProbRunnable implements Runnable {
-        private RotateAnimation mRotate;
-
-        @Override
-        public void run() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mStartButton.setText("Selecting best server based on ping...");
-                }
-            });
-
-            //Get egcodes.speedtest hosts
-            final long startTime = System.currentTimeMillis();
-            while (!mGetSpeedTestHostsHandler.isFinished()) {
-                //最好改为postDelay
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                }
-                //0.1s测试一次，如果1min内没有完成，则输出没有连接
-                if (System.currentTimeMillis() - startTime >= 60000) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "No Connection...", Toast.LENGTH_LONG).show();
-                            mStartButton.setEnabled(true);
-                            mStartButton.setTextSize(16);
-                            mStartButton.setText("Restart Test");
-                        }
-                    });
-                    mGetSpeedTestHostsHandler = null;
-                    return;
-                }
-            }
-
-            //Find closest server
-            HashMap<Integer, String> mapKey = mGetSpeedTestHostsHandler.getMapKey();
-            HashMap<Integer, List<String>> mapValue = mGetSpeedTestHostsHandler.getMapValue();
-            double selfLat = mGetSpeedTestHostsHandler.getSelfLat();
-            double selfLon = mGetSpeedTestHostsHandler.getSelfLon();
-            double tmp = 19349458;
-            double dist = 0.0;
-            int findServerIndex = 0;
-            for (int index : mapKey.keySet()) {
-                if (mTempBlackList.contains(mapValue.get(index).get(5))) {
-                    continue;
-                }
-
-                Location source = new Location("Source");
-                source.setLatitude(selfLat);
-                source.setLongitude(selfLon);
-
-                List<String> ls = mapValue.get(index);
-                Location dest = new Location("Dest");
-                dest.setLatitude(Double.parseDouble(ls.get(0)));
-                dest.setLongitude(Double.parseDouble(ls.get(1)));
-
-                double distance = source.distanceTo(dest);
-                if (tmp > distance) {
-                    tmp = distance;
-                    dist = distance;
-                    findServerIndex = index;
-                }
-            }
-            String uploadAddr = mapKey.get(findServerIndex);
-            final List<String> info = mapValue.get(findServerIndex);
-            final double distance = dist;
-
-            if (info == null) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mStartButton.setTextSize(12);
-                        mStartButton.setText("There was a problem in getting Host Location. Try again later.");
-                    }
-                });
-                return;
-            }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mStartButton.setTextSize(13);
-                    mStartButton.setText(String.format("Host Location: %s [Distance: %s km]", info.get(2), new DecimalFormat("#.##").format(distance / 1000)));
-                }
-            });
-
-
-            final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
-            initPingGraphic(multiPingRenderer);
-
-            final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
-            initDownloadBwGraphic(multiDownloadRenderer);
-
-            final XYMultipleSeriesRenderer multiUploadRenderer = new XYMultipleSeriesRenderer();
-            initUploadBwGraphic(multiUploadRenderer);
-
-
-            //Reset value, graphics
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mPingTextView.setText("0 ms");
-                    mChartPing.removeAllViews();
-                    mDownloadTextView.setText("0 Mbps");
-                    mChartDownload.removeAllViews();
-                    mUploadTextView.setText("0 Mbps");
-                    mChartUpload.removeAllViews();
-                }
-            });
-            final List<Double> pingRateList = new ArrayList<>();
-            final List<Double> downloadRateList = new ArrayList<>();
-            final List<Double> uploadRateList = new ArrayList<>();
-            Boolean pingTestStarted = false;
-            Boolean pingTestFinished = false;
-            Boolean downloadTestStarted = false;
-            Boolean downloadTestFinished = false;
-            Boolean uploadTestStarted = false;
-            Boolean uploadTestFinished = false;
-
-            //Init Test
-            final PingTest pingTest = new PingTest(info.get(6).replace(":8080", ""), 6);
-            final HttpDownloadTest downloadTest = new HttpDownloadTest(uploadAddr.replace(uploadAddr.split("/")[uploadAddr.split("/").length - 1], ""));
-            final HttpUploadTest uploadTest = new HttpUploadTest(uploadAddr);
-
-
-            //Tests
-            while (true) {
-                if (!pingTestStarted) {
-                    pingTest.start();
-                    pingTestStarted = true;
-                }
-                if (pingTestFinished && !downloadTestStarted) {
-                    downloadTest.start();
-                    downloadTestStarted = true;
-                }
-                if (downloadTestFinished && !uploadTestStarted) {
-                    uploadTest.start();
-                    uploadTestStarted = true;
-                }
-
-
-                //Ping Test
-                if (pingTestFinished) {
-                    //Failure
-                    if (pingTest.getAvgRtt() == 0) {
-                        System.out.println("Ping error...");
-                    } else {
-                        //Success
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mPingTextView.setText(mDec.format(pingTest.getAvgRtt()) + " ms");
-                            }
-                        });
-                    }
-                } else {
-                    pingRateList.add(pingTest.getInstantRtt());
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mPingTextView.setText(mDec.format(pingTest.getInstantRtt()) + " ms");
-                        }
-                    });
-
-                    //Update chart
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Creating an  XYSeries for Income
-                            XYSeries pingSeries = new XYSeries("");
-                            pingSeries.setTitle("");
-
-                            int count = 0;
-                            List<Double> tmpLs = new ArrayList<>(pingRateList);
-                            for (Double val : tmpLs) {
-                                pingSeries.add(count++, val);
-                            }
-
-                            XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-                            dataset.addSeries(pingSeries);
-
-                            GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiPingRenderer);
-                            mChartPing.addView(chartView, 0);
-
-                        }
-                    });
-                }
-
-
-                //Download Test
-                if (pingTestFinished) {
-                    if (downloadTestFinished) {
-                        //Failure
-                        if (downloadTest.getFinalDownloadRate() == 0) {
-                            System.out.println("Download error...");
-                        } else {
-                            //Success
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDownloadTextView.setText(mDec.format(downloadTest.getFinalDownloadRate()) + " Mbps");
-                                }
-                            });
-                        }
-                    } else {
-                        //Calc mPosition
-                        double downloadRate = downloadTest.getInstantDownloadRate();
-                        downloadRateList.add(downloadRate);
-
-                        Log.i(TAG, " upload -> " + downloadRate);
-                        mPosition = getPositionByRate(downloadRate);
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                                mRotate.setInterpolator(new LinearInterpolator());
-                                mRotate.setDuration(100);
-                                mBarImageView.startAnimation(mRotate);
-                                mDownloadTextView.setText(mDec.format(downloadTest.getInstantDownloadRate()) + " Mbps");
-                            }
-
-                        });
-                        mLastPosition = mPosition;
-
-                        //Update chart
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Creating an  XYSeries for Income
-                                XYSeries downloadSeries = new XYSeries("");
-                                downloadSeries.setTitle("");
-
-                                List<Double> tmpLs = new ArrayList<>(downloadRateList);
-                                int count = 0;
-                                for (Double val : tmpLs) {
-                                    Log.i(TAG, " upload -> " + val);
-                                    downloadSeries.add(count++, val);
-                                }
-
-                                XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-                                dataset.addSeries(downloadSeries);
-
-                                GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiDownloadRenderer);
-                                mChartDownload.addView(chartView, 0);
-                            }
-                        });
-
-                    }
-                }
-
-
-                //Upload Test
-                if (downloadTestFinished) {
-                    if (uploadTestFinished) {
-                        //Failure
-                        if (uploadTest.getFinalUploadRate() == 0) {
-                            System.out.println("Upload error...");
-                        } else {
-                            //Success
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mUploadTextView.setText(mDec.format(uploadTest.getFinalUploadRate()) + " Mbps");
-                                }
-                            });
-                        }
-                    } else {
-                        //Calc mPosition
-                        double uploadRate = uploadTest.getInstantUploadRate();
-                        uploadRateList.add(uploadRate);
-                        mPosition = getPositionByRate(uploadRate);
-
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                                mRotate.setInterpolator(new LinearInterpolator());
-                                mRotate.setDuration(100);
-                                mBarImageView.startAnimation(mRotate);
-                                mUploadTextView.setText(mDec.format(uploadTest.getInstantUploadRate()) + " Mbps");
-                            }
-
-                        });
-                        mLastPosition = mPosition;
-
-                        //Update chart
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Creating an  XYSeries for Income
-                                XYSeries uploadSeries = new XYSeries("");
-                                uploadSeries.setTitle("");
-
-                                int count = 0;
-                                List<Double> tmpLs = new ArrayList<>(uploadRateList);
-                                for (Double val : tmpLs) {
-                                    Log.i(TAG, " upload -> " + val);
-
-                                    if (count == 0) {
-                                        val = 0.0;
-                                    }
-                                    uploadSeries.add(count++, val);
-                                }
-
-                                XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-                                dataset.addSeries(uploadSeries);
-
-                                GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiUploadRenderer);
-                                mChartUpload.addView(chartView, 0);
-                            }
-                        });
-
-                    }
-                }
-
-                //Test bitti
-                if (pingTestFinished && downloadTestFinished && uploadTest.isFinished()) {
-                    break;
-                }
-
-                if (pingTest.isFinished()) {
-                    pingTestFinished = true;
-                }
-                if (downloadTest.isFinished()) {
-                    downloadTestFinished = true;
-                }
-                if (uploadTest.isFinished()) {
-                    uploadTestFinished = true;
-                }
-
-                if (pingTestStarted && !pingTestFinished) {
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                    }
-                } else {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            }
-
-            //Thread bitiminde button yeniden aktif ediliyor
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mStartButton.setEnabled(true);
-                    mStartButton.setTextSize(16);
-                    mStartButton.setText("Restart Test");
-                }
-            });
-
-
-        }
-    }
-
-
-    private void initPingGraphic(final XYMultipleSeriesRenderer multiPingRenderer){
+    private void initPingGraphic(final XYMultipleSeriesRenderer multiPingRenderer) {
 
         XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
         XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
@@ -688,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         multiPingRenderer.addSeriesRenderer(pingRenderer);
     }
 
-    private void initDownloadBwGraphic(final XYMultipleSeriesRenderer multiDownloadRenderer ){
+    private void initDownloadBwGraphic(final XYMultipleSeriesRenderer multiDownloadRenderer) {
         //Init Download graphic
         XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
         XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
@@ -712,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     }
 
 
-    private void initUploadBwGraphic(final XYMultipleSeriesRenderer multiUploadRenderer){
+    private void initUploadBwGraphic(final XYMultipleSeriesRenderer multiUploadRenderer) {
         //Init Upload graphic
         XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
         XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
@@ -762,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         return thread.getLooper();
     }
 
-    private void jniTest() {
+    private void networkUpdate() {
 
         final JavaUtils javaUtils = new JavaUtils();
         javaUtils.createNativeNetwork();
@@ -773,41 +309,129 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
         String probeIP = "184.170.218.205";
 
-        final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
+        final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat, hearBeatCount, callback);
 
         networkStatistic.lostrateAndRTT(javaUtils, probeIP);
-        networkStatistic.downloadLossrate(javaUtils,probeIP);
+        networkStatistic.downloadLossrate(javaUtils, probeIP);
         networkStatistic.uploadBw(javaUtils, probeIP);
         networkStatistic.downloadBw(javaUtils, probeIP);
     }
 
     ///callback data from  NetworkStatistic
-    public class Callback implements  CallbackBase {
+    public class Callback implements CallbackBase {
 
         @Override
-        public void onRTTandUploadLossCallback(int rtt, float uploadLoss) {
-            Log.i(TAG, "onRTTandUploadLossCallback uploadLoss " + uploadLoss+ " rtt " +rtt);
-            upLossrateList.add(uploadLoss);
-            rttList.add(rtt);
+        public void onRTTandUploadLossCallback(final int rtt, float uploadLoss) {
+            Log.i(TAG, "onRTTandUploadLossCallback uploadLoss " + uploadLoss + " rtt " + rtt);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rttList.add((double) rtt);
+                    mRttTV.setText(String.format(Locale.CHINA, "%.2f ms", (double) rtt));
+                    mRttLL.removeAllViews();
+                    mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
+                }
+            });
         }
 
         @Override
-        public void onUploadBwCallback(int upBw) {
+        public void onUploadBwCallback(final int upBw) {
             Log.i(TAG, "onUploadBwCallback  " + upBw);
-            uploadBwList.add(upBw);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    double upBandWidth = upBw / 1024.0 / 1024;
+                    uploadBwList.add((double) upBandWidth);
+                    mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) upBandWidth));
+                    mUploadBwLL.removeAllViews();
+                    mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
+
+                    mPosition = getPositionByRate(upBandWidth);
+                    mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    mRotate.setInterpolator(new LinearInterpolator());
+                    mRotate.setDuration(100);
+                    mBarImageView.startAnimation(mRotate);
+                    mLastPosition = mPosition;
+                }
+            });
         }
 
         @Override
-        public void onDownloadBwCallback(int downBw) {
+        public void onDownloadBwCallback(final int downBw) {
             Log.i(TAG, "onDownloadBwCallback  " + downBw);
-            downloadBwList.add(downBw);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    double downBandWidth = downBw / 1024.0 / 1024;
+
+                    downloadBwList.add(downBandWidth);
+                    mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) downBandWidth));
+                    mDownloadBwLL.removeAllViews();
+                    mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downloadBwList, getBaseContext()));
+
+                    mPosition = getPositionByRate(downBandWidth);
+                    mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    mRotate.setInterpolator(new LinearInterpolator());
+                    mRotate.setDuration(100);
+                    mBarImageView.startAnimation(mRotate);
+                }
+            });
+            mLastPosition = mPosition;
+//
+//            double uploadRate = uploadTest.getInstantUploadRate();
+//            uploadRateList.add(uploadRate);
+//            mPosition = getPositionByRate(uploadRate);
+//
+//            Log.i(TAG, "mLastPosition " + mLastPosition + " mPosition  " +mPosition);
+//
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+//                    mRotate.setInterpolator(new LinearInterpolator());
+//                    mRotate.setDuration(100);
+//                    mBarImageView.startAnimation(mRotate);
+//                    mUploadTextView.setText(mDec.format(uploadTest.getInstantUploadRate()) + " Mbps");
+//                }
+//
+//            });
+//            mLastPosition = mPosition;
+        }
+
+
+
+        private int getPositionByRate(double rate) {
+            if (rate <= 1) {
+                return (int) (rate * 30);
+
+            } else if (rate <= 10) {
+                return (int) (rate * 6) + 30;
+
+            } else if (rate <= 30) {
+                return (int) ((rate - 10) * 3) + 90;
+
+            } else if (rate <= 50) {
+                return (int) ((rate - 30) * 1.5) + 150;
+
+            } else if (rate <= 100) {
+                return (int) ((rate - 50) * 1.2) + 180;
+            }
+
+            return 0;
         }
 
         @Override
-        public void onDownloadLossCallback(float downloadLoss) {
+        public void onDownloadLossCallback(final float downloadLoss) {
             Log.i(TAG, "onDownloadLossCallback  " + downloadLoss);
-            downLossrateList.add(downloadLoss);
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    downLossRateList.add((double) downloadLoss);
+                    mLossRateTV.setText(String.format(Locale.CHINA, "%.2f", (double) downloadLoss));
+                    mLossRateLL.removeAllViews();
+                    mLossRateLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downLossRateList, getBaseContext()));
+                }
+            });
         }
     }
 

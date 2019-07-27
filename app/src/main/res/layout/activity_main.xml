@@ -38,8 +38,43 @@
             android:layout_height="150dp"
             android:baselineAligned="false"
             android:orientation="horizontal"
-            android:weightSum="3">
+            android:weightSum="4">
 
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="RTT"
+                    android:textAlignment="center"
+                    android:textColor="@color/textColor"
+                    android:textSize="12sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/tv_rtt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0.00 ms"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_rtt_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -51,23 +86,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:text="@string/ping"
+                    android:text="LossRate"
                     android:textAlignment="center"
                     android:textColor="@color/textColor"
                     android:textSize="12sp"
                     android:textStyle="normal|bold" />
 
                 <TextView
-                    android:id="@+id/pingTextView"
+                    android:id="@+id/tv_dw_loss_rate_chart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0 ms"
+                    android:text="0.00"
                     android:textAlignment="center"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
 
                 <LinearLayout
-                    android:id="@+id/chartPing"
+                    android:id="@+id/ll_dw_loss_rate_chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
@@ -94,16 +129,16 @@
                     android:textStyle="normal|bold" />
 
                 <TextView
-                    android:id="@+id/downloadTextView"
+                    android:id="@+id/tv_download"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0 Mbps"
+                    android:text="0.00 Mbps"
                     android:textAlignment="center"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
 
                 <LinearLayout
-                    android:id="@+id/chartDownload"
+                    android:id="@+id/ll_download_chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical" />
@@ -127,16 +162,16 @@
                     android:textStyle="normal|bold" />
 
                 <TextView
-                    android:id="@+id/uploadTextView"
+                    android:id="@+id/tv_upload"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0 Mbps"
+                    android:text="0.00 Mbps"
                     android:textAlignment="center"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
 
                 <LinearLayout
-                    android:id="@+id/chartUpload"
+                    android:id="@+id/ll_upload_chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">

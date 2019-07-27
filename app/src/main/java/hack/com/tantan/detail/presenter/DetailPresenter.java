@@ -13,9 +13,13 @@ import com.netease.net.detector.sdk.exception.NetDetectorException;
 import com.netease.net.detector.sdk.ip.IpInfo;
 import com.netease.net.detector.sdk.ipv6.IPv6Info;
 import com.netease.net.detector.sdk.ping.PingInfo;
+import com.netease.net.detector.sdk.qos.QosInfo;
 import com.netease.net.detector.sdk.report.ReportStats;
 import com.netease.net.detector.sdk.telnet.TelnetInfo;
 import com.netease.net.detector.sdk.traceroute.TraceRouteInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import hack.com.tantan.detail.contract.DetailContractView;
 import hack.com.tantan.utils.ServiceDataHandler;
@@ -44,6 +48,15 @@ public class DetailPresenter {
                     //可以拿到下发的配置
                     NetDetectorConfig config = task.getConfig();
                     ReportStats reportStats = task.getCurrentReportStats();
+                    List<QosInfo> qosInfoList = new ArrayList<>();
+                    QosInfo qosInfo = new QosInfo();
+                    qosInfo.setHost("");
+                    qosInfo.setRtt(1);
+                    qosInfo.setDownloadBandwidth(1);
+                    qosInfo.setDownloadLossRate(0.0);
+                    qosInfo.setUploadBandwidth(1);
+                    qosInfo.setUploadLossRate(0.0);
+                    reportStats.setQosInfoList(qosInfoList);
                     String reportId = task.report();
                     Log.e("@CJL/reportId", reportId);
                 } catch (NetDetectorException e) {
