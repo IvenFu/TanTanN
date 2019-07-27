@@ -131,6 +131,7 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingUpBw
     if (networkTT != nullptr) {
         const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
         networkTT->Probing_Up_Bw(charIP);
+        return 0;
     }
 
     return  -1;
@@ -151,7 +152,7 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetUpBw
         return retUpBW;
     }
 
-    LOGD("retUpBW failed ");
+    LOGD("GetUpBw failed ");
 
     return -1;
 
@@ -166,6 +167,7 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
     if (networkTT != nullptr) {
         const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
         networkTT->Probing_Up_Bw(charIP);
+        return 0;
     }
 
     return -1;
@@ -174,7 +176,7 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
 
 extern "C" {
 JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetDownBw
-        (JNIEnv *env, jobject,jlong network){
+        (JNIEnv *env, jobject, jlong network) {
 
     NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
     if (networkTT != nullptr) {
@@ -186,9 +188,49 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_GetDownBw
         return retDownBW;
     }
 
-    LOGD("retDownBW failed ");
+    LOGD("GetDownBw failed ");
 
     return -1;
 
+}
+}
+
+extern "C" {
+JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownLossrate
+        (JNIEnv *env, jobject, jlong network, jstring probeIP) {
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+        const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
+
+        networkTT->Probing_Down_Lossrate(charIP);
+
+        LOGD("ProbingDownLostrate ");
+
+        return 0;
+    }
+
+    LOGD("ProbingDownLostrate failed ");
+
+    return -1;
+}
+}
+
+extern "C" {
+JNIEXPORT float JNICALL Java_hack_com_tantan_JavaUtils_GetDownLossrate
+        (JNIEnv *env, jobject, jlong network) {
+
+    NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
+    if (networkTT != nullptr) {
+        float downLostrate = networkTT->Get_Down_Lossrate();
+
+        LOGD("GetDownLossrate");
+
+        return downLostrate;
+    }
+
+    LOGD("GetDownLossrate failed ");
+
+    return -1;
 }
 }

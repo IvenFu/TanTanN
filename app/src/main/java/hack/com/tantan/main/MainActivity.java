@@ -3,11 +3,12 @@ package hack.com.tantan.main;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -36,9 +37,10 @@ import java.util.List;
 import hack.com.tantan.GetSpeedTestHostsHandler;
 import hack.com.tantan.JavaUtils;
 import hack.com.tantan.R;
+import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.main.contract.MainContractView;
 import hack.com.tantan.main.presenter.MainPresenter;
-import hack.com.tantan.detail.DetailActivity;
+import hack.com.tantan.test.CallbackBase;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.NetworkStatistic;
@@ -648,25 +650,40 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     private void jniTest() {
 
-        final Button jniTest = (Button) findViewById(R.id.jniTest);
         final JavaUtils javaUtils = new JavaUtils();
-        final NetworkStatistic networkStatistic = new NetworkStatistic();
+        int heartBeat = 1000;
+        int hearBeatCount = 5;
+        Callback callback = new Callback();
 
-        jniTest.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
 
-                //String probeIP = "172.16.10.129";
-                String probeIP = "184.170.218.205";
-                javaUtils.init();
+        String probeIP = "184.170.218.205";
+        networkStatistic.uploadBw(javaUtils, probeIP);
 
+        networkStatistic.downloadBw(javaUtils, probeIP);
+        networkStatistic.lostrateAndRTT(javaUtils, probeIP);
+        networkStatistic.downloadLossrate(javaUtils,probeIP);
+    }
 
-                networkStatistic.lostrateAndRTT(javaUtils, probeIP);
-                networkStatistic.uploadBw(javaUtils, probeIP);
-                networkStatistic.downloadBw(javaUtils, probeIP);
+    ///callback data from  NetworkStatistic
+    public class Callback implements  CallbackBase {
 
-                javaUtils.uninit();
-            }
-        });
+        @Override
+        public void call(int data){
+
+            Log.i("Callback" , "statisticNetwork int " + data);
+        }
+
+        @Override
+        public void call(float data){
+
+            Log.i("Callback" , "statisticNetwork float " + data);
+        }
+
+        @Override
+        public void call(int data1, float data2) {
+            Log.i("Callback" , "statisticNetwork data1 " + data1+ " data2 "+data2);
+        }
     }
 
 }
