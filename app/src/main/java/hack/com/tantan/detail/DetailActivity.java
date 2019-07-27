@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.netease.net.detector.sdk.exception.NetDetectorException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +22,7 @@ import hack.com.tantan.detail.presenter.DetailPresenter;
 
 public class DetailActivity extends AppCompatActivity implements DetailContractView, View.OnClickListener {
     private ImageButton mBackBtn = null;
+    private Button mTestBtn = null;
     private DetailPresenter mPresenter = null;
 
     @Override
@@ -37,6 +41,9 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
 
         mBackBtn = findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
+
+        mTestBtn = findViewById(R.id.btn_test);
+        mTestBtn.setOnClickListener(this);
     }
 
     @Override
@@ -44,6 +51,10 @@ public class DetailActivity extends AppCompatActivity implements DetailContractV
         switch (v.getId()) {
             case R.id.btn_back:
                 DetailActivity.this.finish();
+                break;
+            case R.id.btn_test:
+                mPresenter.execute();
+                break;
             default:
                 break;
         }

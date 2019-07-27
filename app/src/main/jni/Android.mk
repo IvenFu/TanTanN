@@ -19,7 +19,6 @@ LOCAL_C_INCLUDES := networkTT.h \
 #LOCAL_SHARED_LIBRARIES := libNPQos \
 #                          libProbing
 
-
 LOCAL_LDLIBS := -lProbing -lm -llog
 
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/../../../libs/armeabi-v7a
