@@ -12,9 +12,6 @@ public class JavaUtils {
         System.loadLibrary("jnitest");
     }
 
-    public  JavaUtils(){
-
-    }
 
     public void  createNativeNetwork(){
 

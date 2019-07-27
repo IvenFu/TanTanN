@@ -8,6 +8,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telecom.Call;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -39,6 +41,7 @@ import hack.com.tantan.R;
 import hack.com.tantan.main.contract.MainContractView;
 import hack.com.tantan.main.presenter.MainPresenter;
 import hack.com.tantan.detail.DetailActivity;
+import hack.com.tantan.test.CallbackBase;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.NetworkStatistic;
@@ -649,8 +652,20 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private void jniTest() {
 
         final Button jniTest = (Button) findViewById(R.id.jniTest);
+
         final JavaUtils javaUtils = new JavaUtils();
-        final NetworkStatistic networkStatistic = new NetworkStatistic();
+        int heartBeat = 1000;
+        int hearBeatCount = 5;
+        Callback callback = new Callback();
+
+        final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
+
+        String probeIP = "184.170.218.205";
+        networkStatistic.uploadBw(javaUtils, probeIP);
+
+        networkStatistic.downloadBw(javaUtils, probeIP);
+        networkStatistic.lostrateAndRTT(javaUtils, probeIP);
+
 
         jniTest.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -667,6 +682,27 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 javaUtils.uninit();
             }
         });
+    }
+
+    ///callback data from  NetworkStatistic
+    public class Callback implements  CallbackBase {
+
+        @Override
+        public void call(int data){
+
+            Log.i("Callback" , "statisticNetwork int " + data);
+        }
+
+        @Override
+        public void call(float data){
+
+            Log.i("Callback" , "statisticNetwork float " + data);
+        }
+
+        @Override
+        public void call(int data1, float data2) {
+            Log.i("Callback" , "statisticNetwork data1 " + data1+ " data2 "+data2);
+        }
     }
 
 }
