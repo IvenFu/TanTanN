@@ -13,7 +13,7 @@ public interface MainContractView {
 
     void onGetHostLocationFailed();
 
-    void onGetHostLocation(String location, double distance);
+    void onGetHostLocation(final String location, final double distance);
 
     void reset();
 
