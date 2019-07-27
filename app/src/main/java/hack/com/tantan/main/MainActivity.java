@@ -71,6 +71,12 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     final List<Double> rttList = new ArrayList<>();
 
+
+    int getDownloadBwCount = 0 ;
+    int heartBeat = 500;
+    int hearBeatCount = 10;
+    String probeIP = "184.170.218.205";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +101,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 //        mRotate.setDuration(100);
 //        mBarImageView.startAnimation(mRotate);
 
-        networkUpdate();
     }
 
     private void findView() {
@@ -116,8 +121,8 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_start:
-                mStartButton.setEnabled(false);
-                networkUpdate();
+                 mStartButton.setEnabled(false);
+                 networkUpdate();
                 break;
             case R.id.btn_detail:
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
@@ -303,18 +308,17 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         final JavaUtils javaUtils = new JavaUtils();
         javaUtils.createNativeNetwork();
 
-        int heartBeat = 500;
-        int hearBeatCount = 10;
         Callback callback = new Callback();
 
-        String probeIP = "184.170.218.205";
 
         final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat, hearBeatCount, callback);
 
-        networkStatistic.lostrateAndRTT(javaUtils, probeIP);
-        networkStatistic.downloadLossrate(javaUtils, probeIP);
-        networkStatistic.uploadBw(javaUtils, probeIP);
-        networkStatistic.downloadBw(javaUtils, probeIP);
+        networkStatistic.setProbeIP(probeIP);
+
+        networkStatistic.lostrateAndRTT(javaUtils);
+        networkStatistic.downloadLossrate(javaUtils);
+        networkStatistic.uploadBw(javaUtils);
+        networkStatistic.downloadBw(javaUtils);
     }
 
     ///callback data from  NetworkStatistic
@@ -327,7 +331,18 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 @Override
                 public void run() {
                     rttList.add((double) rtt);
-                    mRttTV.setText(String.format(Locale.CHINA, "%.2f ms", (double) rtt));
+
+                    Double sum = 0.0;
+                    double rtt_ = 0.0;
+                    for(Double val:rttList){
+                        sum += val;
+                    }
+
+                    if(rttList.size() != 0) {
+                        rtt_ = sum / rttList.size();
+                    }
+
+                    mRttTV.setText(String.format(Locale.CHINA, "%.2f ms", (double) rtt_));
                     mRttLL.removeAllViews();
                     mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
                 }
@@ -341,17 +356,32 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 @Override
                 public void run() {
                     double upBandWidth = upBw / 1024.0 / 1024;
+
                     uploadBwList.add((double) upBandWidth);
-                    mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) upBandWidth));
+
+                    Double sum = 0.0;
+                    double upBw = 0.0;
+                    for(Double val:uploadBwList){
+                        sum += val;
+                    }
+
+                    if(uploadBwList.size() != 0) {
+                        upBw = sum / uploadBwList.size();
+                    }
+
+                    mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) upBw));
                     mUploadBwLL.removeAllViews();
                     mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
 
                     mPosition = getPositionByRate(upBandWidth);
                     mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    mRotate.setFillAfter(true);
                     mRotate.setInterpolator(new LinearInterpolator());
                     mRotate.setDuration(100);
                     mBarImageView.startAnimation(mRotate);
+
                     mLastPosition = mPosition;
+
                 }
             });
         }
@@ -365,37 +395,30 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     double downBandWidth = downBw / 1024.0 / 1024;
 
                     downloadBwList.add(downBandWidth);
+
+                    Double sum = 0.0;
+                    for(Double val:downloadBwList){
+                        sum += val;
+                    }
+                    if(downloadBwList.size() != 0) {
+                        downBandWidth = sum / downloadBwList.size();
+                    }
+
                     mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) downBandWidth));
                     mDownloadBwLL.removeAllViews();
                     mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downloadBwList, getBaseContext()));
 
                     mPosition = getPositionByRate(downBandWidth);
                     mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    mRotate.setFillAfter(true);
                     mRotate.setInterpolator(new LinearInterpolator());
                     mRotate.setDuration(100);
                     mBarImageView.startAnimation(mRotate);
+
+                    mLastPosition = mPosition;
                 }
             });
-            mLastPosition = mPosition;
-//
-//            double uploadRate = uploadTest.getInstantUploadRate();
-//            uploadRateList.add(uploadRate);
-//            mPosition = getPositionByRate(uploadRate);
-//
-//            Log.i(TAG, "mLastPosition " + mLastPosition + " mPosition  " +mPosition);
-//
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                    mRotate.setInterpolator(new LinearInterpolator());
-//                    mRotate.setDuration(100);
-//                    mBarImageView.startAnimation(mRotate);
-//                    mUploadTextView.setText(mDec.format(uploadTest.getInstantUploadRate()) + " Mbps");
-//                }
-//
-//            });
-//            mLastPosition = mPosition;
+
         }
 
 
@@ -423,13 +446,36 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         @Override
         public void onDownloadLossCallback(final float downloadLoss) {
             Log.i(TAG, "onDownloadLossCallback  " + downloadLoss);
+
+            synchronized (this) {
+                getDownloadBwCount++;
+            }
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     downLossRateList.add((double) downloadLoss);
-                    mLossRateTV.setText(String.format(Locale.CHINA, "%.2f", (double) downloadLoss));
+
+                    Double sum = 0.0;
+                    double dnLossRate = 0;
+                    for(Double val:downLossRateList){
+                        sum += val;
+                    }
+
+                    if(downLossRateList.size() != 0) {
+                        dnLossRate = sum / downLossRateList.size();
+                    }
+
+                    mLossRateTV.setText(String.format(Locale.CHINA, "%.2f", (double) dnLossRate));
                     mLossRateLL.removeAllViews();
                     mLossRateLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downLossRateList, getBaseContext()));
+
+                    synchronized (this) {
+                        if (getDownloadBwCount >= hearBeatCount) {
+                            mStartButton.setEnabled(true);
+                        }
+                    }
+
                 }
             });
         }

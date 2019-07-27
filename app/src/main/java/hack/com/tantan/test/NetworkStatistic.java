@@ -24,6 +24,7 @@ public class NetworkStatistic {
     HandlerThread monitor;
 
     private Handler mMonitorHandler;
+    private String mProbeIP ;
 
     public  NetworkStatistic(int heartBeat, int heartBeatCount, CallbackBase callbackBase){
 
@@ -36,13 +37,17 @@ public class NetworkStatistic {
         mMonitorHandler = new Handler(monitor.getLooper());
     }
 
-    public void uploadBw(final JavaUtils javaUtils ,final String probeIP){
+
+    public  void  setProbeIP(String probeIP){
+        mProbeIP = probeIP;
+    }
+    public void uploadBw(final JavaUtils javaUtils){
 
         mStatsRunnable =  new Runnable() {
             @Override
             public void run() {
 
-                javaUtils.probingUpBw(probeIP);
+                javaUtils.probingUpBw(mProbeIP);
 
                 ///probe may take some time, so we sleep a while.
                 try {
@@ -66,12 +71,12 @@ public class NetworkStatistic {
 
     }
 
-    public void downloadBw(final  JavaUtils javaUtils , final String probeIP){
+    public void downloadBw(final  JavaUtils javaUtils){
 
         mStatsRunnable =  new Runnable() {
             @Override
             public void run() {
-                javaUtils.probingDownBw(probeIP);
+                javaUtils.probingDownBw(mProbeIP);
 
                 ///probe may take some time, so we sleep a while.
                 try {
@@ -95,13 +100,13 @@ public class NetworkStatistic {
         mMonitorHandler.post(mStatsRunnable);
     }
 
-    public void lostrateAndRTT(final  JavaUtils javaUtils , final  String probeIP){
+    public void lostrateAndRTT(final  JavaUtils javaUtils){
 
         mStatsRunnable =  new Runnable() {
             @Override
             public void run() {
 
-                javaUtils.probingLostrateAndRTT(probeIP);
+                javaUtils.probingLostrateAndRTT(mProbeIP);
                 ///probe may take some time, so we sleep a while.
                 try {
                     Thread.sleep(mHeartBeat);
@@ -127,13 +132,13 @@ public class NetworkStatistic {
         mMonitorHandler.post(mStatsRunnable);
     }
 
-    public void downloadLossrate(final  JavaUtils javaUtils , final String probeIP){
+    public void downloadLossrate(final  JavaUtils javaUtils){
 
         mStatsRunnable =  new Runnable() {
             @Override
             public void run() {
 
-                javaUtils.probingDownLostrate(probeIP);
+                javaUtils.probingDownLostrate(mProbeIP);
                 ///probe may take some time, so we sleep a while.
                 try {
                     Thread.sleep(mHeartBeat);
