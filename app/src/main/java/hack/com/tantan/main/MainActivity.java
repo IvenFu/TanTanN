@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 @Override
                 public void run() {
                     rttList.add((double) rtt);
-                    mRttTV.setText(String.format(Locale.CHINA, "%.2f ms", (double) rtt));
+                    mRttTV.setText(String.format(Locale.CHINA, "%.2f Ms", (double) rtt));
                     mRttLL.removeAllViews();
                     mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
                 }
@@ -342,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 public void run() {
                     double upBandWidth = upBw / 1024.0 / 1024;
                     uploadBwList.add((double) upBandWidth);
-                    mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) upBandWidth));
+                    mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) upBandWidth));
                     mUploadBwLL.removeAllViews();
                     mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
 
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     double downBandWidth = downBw / 1024.0 / 1024;
 
                     downloadBwList.add(downBandWidth);
-                    mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f mbps", (double) downBandWidth));
+                    mDownloadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) downBandWidth));
                     mDownloadBwLL.removeAllViews();
                     mDownloadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(downloadBwList, getBaseContext()));
 
@@ -377,25 +377,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 }
             });
             mLastPosition = mPosition;
-//
-//            double uploadRate = uploadTest.getInstantUploadRate();
-//            uploadRateList.add(uploadRate);
-//            mPosition = getPositionByRate(uploadRate);
-//
-//            Log.i(TAG, "mLastPosition " + mLastPosition + " mPosition  " +mPosition);
-//
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                    mRotate.setInterpolator(new LinearInterpolator());
-//                    mRotate.setDuration(100);
-//                    mBarImageView.startAnimation(mRotate);
-//                    mUploadTextView.setText(mDec.format(uploadTest.getInstantUploadRate()) + " Mbps");
-//                }
-//
-//            });
-//            mLastPosition = mPosition;
         }
 
 

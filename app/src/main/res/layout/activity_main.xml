@@ -6,10 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="hack.com.tantan.main.MainActivity">
 
     <LinearLayout
@@ -61,7 +61,7 @@
                     android:id="@+id/tv_rtt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0.00 ms"
+                    android:text="0.00 Ms"
                     android:textAlignment="center"
                     android:textColor="@android:color/background_light"
                     android:textSize="20sp" />
@@ -75,6 +75,7 @@
                 </LinearLayout>
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -118,39 +119,6 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/download"
-                    android:textAlignment="center"
-                    android:textColor="@color/textColor"
-                    android:textSize="12sp"
-                    android:textStyle="normal|bold" />
-
-                <TextView
-                    android:id="@+id/tv_download"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="0.00 Mbps"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/background_light"
-                    android:textSize="20sp" />
-
-                <LinearLayout
-                    android:id="@+id/ll_download_chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
                     android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -179,6 +147,39 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/download"
+                    android:textAlignment="center"
+                    android:textColor="@color/textColor"
+                    android:textSize="12sp"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:id="@+id/tv_download"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0.00 Mbps"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/background_light"
+                    android:textSize="20sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_download_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <RelativeLayout
@@ -189,10 +190,10 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
-                app:srcCompat="@mipmap/speedometer"
-                android:contentDescription="@string/speedometer" />
+                android:layout_alignParentEnd="true"
+                android:contentDescription="@string/speedometer"
+                app:srcCompat="@mipmap/speedometer" />
 
 
             <ImageView
@@ -201,29 +202,28 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                app:srcCompat="@mipmap/bar"
-                android:contentDescription="@string/speedometer" />
+                android:contentDescription="@string/speedometer"
+                app:srcCompat="@mipmap/bar" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
-                android:weightSum="2"
-                >
+                android:layout_alignParentBottom="true"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
                 <Button
                     android:id="@+id/btn_start"
                     style="@style/BottomButton"
                     android:layout_weight="1"
-                    android:text="@string/begin_test"/>
+                    android:text="@string/begin_test" />
+
                 <Button
                     android:id="@+id/btn_detail"
                     style="@style/BottomButton"
                     android:layout_weight="1"
-                    android:text="@string/details"
-                    />
+                    android:text="@string/details" />
             </LinearLayout>
 
         </RelativeLayout>
