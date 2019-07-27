@@ -17,7 +17,7 @@ public class TestMain {
         //可以拿到下发的配置
         NetDetectorConfig config = task.getConfig();
         ReportStats reportStats = task.getCurrentReportStats();
-        String reportId = task.closeAndReport();
+        String reportId = task.report();
         System.out.println(reportId);
     }
 }

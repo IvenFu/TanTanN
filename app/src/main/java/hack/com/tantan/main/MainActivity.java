@@ -3,12 +3,11 @@ package hack.com.tantan.main;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -38,9 +37,9 @@ import java.util.List;
 import hack.com.tantan.GetSpeedTestHostsHandler;
 import hack.com.tantan.JavaUtils;
 import hack.com.tantan.R;
+import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.main.contract.MainContractView;
 import hack.com.tantan.main.presenter.MainPresenter;
-import hack.com.tantan.detail.DetailActivity;
 import hack.com.tantan.test.CallbackBase;
 import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
@@ -48,7 +47,7 @@ import hack.com.tantan.test.NetworkStatistic;
 import hack.com.tantan.test.PingTest;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements MainContractView, View.OnClickListener {
     private final String TAG = "MainActivity";
     private static int mPosition = 0;
     private static int mLastPosition = 0;
@@ -57,6 +56,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mStartButton = null;
     private DecimalFormat mDec = null;
     private Button mGoToDetailButton = null;
+    private ImageView mBarImageView = null;
+    private TextView mPingTextView = null;
+    private TextView mDownloadTextView = null;
+    private TextView mUploadTextView = null;
+    private LinearLayout mChartPing = null;
+    private LinearLayout mChartDownload = null;
+    private LinearLayout mChartUpload = null;
     private MainPresenter mPresenter = null;
     /**
      * 测试用进程的名称
@@ -73,22 +79,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         window.setStatusBarColor(getResources().getColor(R.color.colorPrimary2));
 
         setContentView(R.layout.activity_main);
+        findView();
 
-        mStartButton = (Button) findViewById(R.id.btn_start);
-        mStartButton.setOnClickListener(this);
         mDec = new DecimalFormat("#.##");
-
-        mStartButton.setText("Begin Test");
-
         mTempBlackList = new HashSet<>();
+        mStartButton.setOnClickListener(this);
+        mStartButton.setText("Begin Test");
 
         mGetSpeedTestHostsHandler = new GetSpeedTestHostsHandler();
         mGetSpeedTestHostsHandler.start();
-
-        mGoToDetailButton = findViewById(R.id.btn_detail);
         mGoToDetailButton.setOnClickListener(this);
+
         //for jniTest
         jniTest();
+    }
+
+    private void findView() {
+        mStartButton = findViewById(R.id.btn_start);
+        mGoToDetailButton = findViewById(R.id.btn_detail);
+        mBarImageView = findViewById(R.id.img_bar);
+        mPingTextView = findViewById(R.id.pingTextView);
+        mDownloadTextView = findViewById(R.id.downloadTextView);
+        mUploadTextView = findViewById(R.id.uploadTextView);
+        mChartPing = findViewById(R.id.chartPing);
+        mChartDownload = findViewById(R.id.chartDownload);
+        mChartUpload = findViewById(R.id.chartUpload);
     }
 
     @Override
@@ -122,15 +137,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onSelectingBaseServer() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStartButton.setText("Selecting best server based on ping...");
+            }
+        });
+    }
+
+    @Override
+    public void onNoConnection() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), "No Connection...", Toast.LENGTH_LONG).show();
+                mStartButton.setEnabled(true);
+                mStartButton.setTextSize(16);
+                mStartButton.setText("Restart Test");
+            }
+        });
+    }
+
+    @Override
+    public void onGetHostLocationFailed() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStartButton.setTextSize(12);
+                mStartButton.setText("There was a problem in getting Host Location. Try again later.");
+            }
+        });
+    }
+
+    @Override
+    public void onGetHostLocation(final String location, final double distance) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mStartButton.setTextSize(13);
+                mStartButton.setText(String.format("Host Location: %s [Distance: %s km]", location, new DecimalFormat("#.##").format(distance / 1000)));
+            }
+        });
+
+    }
+
+    @Override
+    public void reset() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mBarImageView = findViewById(R.id.img_bar);
+                mPingTextView.setText("0 ms");
+                mChartPing.removeAllViews();
+                mDownloadTextView.setText("0 Mbps");
+                mChartDownload.removeAllViews();
+                mUploadTextView.setText("0 Mbps");
+                mChartUpload.removeAllViews();
+            }
+        });
+
+    }
+
+    @Override
+    public void onPingTestFinished() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+
+    }
+
     /**
      * 探测的Runnable
      */
     class ProbRunnable implements Runnable {
         private RotateAnimation mRotate;
-        private ImageView mBarImageView = (ImageView) findViewById(R.id.img_bar);
-        private TextView mPingTextView = (TextView) findViewById(R.id.pingTextView);
-        private TextView mDownloadTextView = (TextView) findViewById(R.id.downloadTextView);
-        private TextView mUploadTextView = (TextView) findViewById(R.id.uploadTextView);
 
         @Override
         public void run() {
@@ -218,7 +303,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
 
             //Init Ping graphic
-            final LinearLayout chartPing = (LinearLayout) findViewById(R.id.chartPing);
             XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
             XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
             pingFill.setColor(Color.parseColor("#4d5a6a"));
@@ -239,7 +323,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             multiPingRenderer.addSeriesRenderer(pingRenderer);
 
             //Init Download graphic
-            final LinearLayout chartDownload = (LinearLayout) findViewById(R.id.chartDownload);
             XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
             XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
             downloadFill.setColor(Color.parseColor("#4d5a6a"));
@@ -260,7 +343,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             multiDownloadRenderer.addSeriesRenderer(downloadRenderer);
 
             //Init Upload graphic
-            final LinearLayout chartUpload = (LinearLayout) findViewById(R.id.chartUpload);
             XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
             XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
             uploadFill.setColor(Color.parseColor("#4d5a6a"));
@@ -285,11 +367,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     mPingTextView.setText("0 ms");
-                    chartPing.removeAllViews();
+                    mChartPing.removeAllViews();
                     mDownloadTextView.setText("0 Mbps");
-                    chartDownload.removeAllViews();
+                    mChartDownload.removeAllViews();
                     mUploadTextView.setText("0 Mbps");
-                    chartUpload.removeAllViews();
+                    mChartUpload.removeAllViews();
                 }
             });
             final List<Double> pingRateList = new ArrayList<>();
@@ -366,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             dataset.addSeries(pingSeries);
 
                             GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiPingRenderer);
-                            chartPing.addView(chartView, 0);
+                            mChartPing.addView(chartView, 0);
 
                         }
                     });
@@ -395,7 +477,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mPosition = getPositionByRate(downloadRate);
 
                         runOnUiThread(new Runnable() {
-
                             @Override
                             public void run() {
                                 mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -403,7 +484,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 mRotate.setDuration(100);
                                 mBarImageView.startAnimation(mRotate);
                                 mDownloadTextView.setText(mDec.format(downloadTest.getInstantDownloadRate()) + " Mbps");
-
                             }
 
                         });
@@ -427,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 dataset.addSeries(downloadSeries);
 
                                 GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiDownloadRenderer);
-                                chartDownload.addView(chartView, 0);
+                                mChartDownload.addView(chartView, 0);
                             }
                         });
 
@@ -491,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 dataset.addSeries(uploadSeries);
 
                                 GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiUploadRenderer);
-                                chartUpload.addView(chartView, 0);
+                                mChartUpload.addView(chartView, 0);
                             }
                         });
 
