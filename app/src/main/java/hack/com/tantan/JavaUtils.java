@@ -16,7 +16,7 @@ public class JavaUtils {
     public void  createNativeNetwork(){
 
         nativeNetwork = createNetwork(nativeNetwork);
-        Log.d(TAG, "createNativeNetwork " + nativeNetwork);
+        Log.i(TAG, "createNativeNetwork " + nativeNetwork);
     }
 
     public  void  init(){
@@ -34,6 +34,7 @@ public class JavaUtils {
     public float getLossrate(){
         return GetLossrate(nativeNetwork);
     }
+
     public int getRTT(){
         return GetRTT(nativeNetwork);
     }

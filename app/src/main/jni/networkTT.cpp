@@ -14,11 +14,12 @@
 
 
 NetworkTT::NetworkTT() {
+
 }
 
 NetworkTT::~NetworkTT() {
 
-    LOGD( " ~~NetworkTT  ");
+    LOGD( " ~~NetworkTT() ");
 
 }
 
@@ -86,7 +87,7 @@ int NetworkTT::Probing_Down_Bw(const char* probeIP){
 //ªÒ»°Ω·π˚
 int NetworkTT::Get_Down_Bw(){
     int  downBw = 0;
-    GetUpBw(&downBw);
+    GetDownBw(&downBw);
     return downBw;
 }
 

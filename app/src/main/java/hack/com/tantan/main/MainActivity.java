@@ -45,6 +45,7 @@ import hack.com.tantan.test.HttpDownloadTest;
 import hack.com.tantan.test.HttpUploadTest;
 import hack.com.tantan.test.NetworkStatistic;
 import hack.com.tantan.test.PingTest;
+import hack.com.tantan.utils.XYMultipleSeriesRendererHandler;
 
 
 public class MainActivity extends AppCompatActivity implements MainContractView, View.OnClickListener {
@@ -69,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
      */
     private static final String PROB_THREAD_NAME = "ProbThread";
 
+    final List<Float> upLossrateList = new ArrayList<>();
+    final List<Float> downLossrateList = new ArrayList<>();
+
+    final List<Integer> uploadBwList = new ArrayList<>();
+    final List<Integer> downloadBwList = new ArrayList<>();
+
+    final List<Integer> rttList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         mGetSpeedTestHostsHandler.start();
         mGoToDetailButton.setOnClickListener(this);
 
-        //for jniTest
         jniTest();
     }
 
@@ -211,6 +219,81 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     }
 
+    class UpdateRunnable implements  Runnable{
+
+        @Override
+        public void run() {
+            ///button upload
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mStartButton.setText("Selecting best server based on ping...");
+                }
+            });
+
+            //create chart;
+            final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
+            initPingGraphic(multiPingRenderer);
+            final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
+            initDownloadBwGraphic(multiDownloadRenderer);
+            final XYMultipleSeriesRenderer multiUploadRenderer = new XYMultipleSeriesRenderer();
+            initUploadBwGraphic(multiUploadRenderer);
+
+            //Reset value, graphics
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mPingTextView.setText("0 ms");
+                    mChartPing.removeAllViews();
+                    mDownloadTextView.setText("0 Mbps");
+                    mChartDownload.removeAllViews();
+                    mUploadTextView.setText("0 Mbps");
+                    mChartUpload.removeAllViews();
+                }
+            });
+
+            jniTest();
+   /*         final JavaUtils javaUtils = new JavaUtils();
+            javaUtils.createNativeNetwork();
+
+            int heartBeat = 500;
+            int hearBeatCount = 20;
+            Callback callback = new Callback();
+            String probeIP = "184.170.218.205";
+
+            final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
+
+            networkStatistic.lostrateAndRTT(javaUtils,probeIP);*/
+
+            for(int i= 0;i<10; i++){
+                //Update chart
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Creating an  XYSeries for Income
+                        XYSeries pingSeries = new XYSeries("");
+                        pingSeries.setTitle("");
+
+                        int count = 0;
+                        List<Integer> tmpLs = new ArrayList<>(uploadBwList);
+                        for (Integer val : tmpLs) {
+                            pingSeries.add(count++, val);
+                        }
+
+                        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+                        dataset.addSeries(pingSeries);
+
+                        GraphicalView chartView = ChartFactory.getLineChartView(getBaseContext(), dataset, multiPingRenderer);
+                        mChartPing.addView(chartView, 0);
+
+                    }
+                });
+            }
+
+        }
+    }
+
+
     /**
      * 探测的Runnable
      */
@@ -302,65 +385,16 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 }
             });
 
-            //Init Ping graphic
-            XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
-            XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-            pingFill.setColor(Color.parseColor("#4d5a6a"));
-            pingRenderer.addFillOutsideLine(pingFill);
-            pingRenderer.setDisplayChartValues(false);
-            pingRenderer.setShowLegendItem(false);
-            pingRenderer.setColor(Color.parseColor("#4d5a6a"));
-            pingRenderer.setLineWidth(5);
+
             final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
-            multiPingRenderer.setXLabels(0);
-            multiPingRenderer.setYLabels(0);
-            multiPingRenderer.setZoomEnabled(false);
-            multiPingRenderer.setXAxisColor(Color.parseColor("#647488"));
-            multiPingRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-            multiPingRenderer.setPanEnabled(true, true);
-            multiPingRenderer.setZoomButtonsVisible(false);
-            multiPingRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-            multiPingRenderer.addSeriesRenderer(pingRenderer);
+            initPingGraphic(multiPingRenderer);
 
-            //Init Download graphic
-            XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
-            XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-            downloadFill.setColor(Color.parseColor("#4d5a6a"));
-            downloadRenderer.addFillOutsideLine(downloadFill);
-            downloadRenderer.setDisplayChartValues(false);
-            downloadRenderer.setColor(Color.parseColor("#4d5a6a"));
-            downloadRenderer.setShowLegendItem(false);
-            downloadRenderer.setLineWidth(5);
             final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
-            multiDownloadRenderer.setXLabels(0);
-            multiDownloadRenderer.setYLabels(0);
-            multiDownloadRenderer.setZoomEnabled(false);
-            multiDownloadRenderer.setXAxisColor(Color.parseColor("#647488"));
-            multiDownloadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-            multiDownloadRenderer.setPanEnabled(false, false);
-            multiDownloadRenderer.setZoomButtonsVisible(false);
-            multiDownloadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-            multiDownloadRenderer.addSeriesRenderer(downloadRenderer);
+            initDownloadBwGraphic(multiDownloadRenderer);
 
-            //Init Upload graphic
-            XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
-            XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-            uploadFill.setColor(Color.parseColor("#4d5a6a"));
-            uploadRenderer.addFillOutsideLine(uploadFill);
-            uploadRenderer.setDisplayChartValues(false);
-            uploadRenderer.setColor(Color.parseColor("#4d5a6a"));
-            uploadRenderer.setShowLegendItem(false);
-            uploadRenderer.setLineWidth(5);
             final XYMultipleSeriesRenderer multiUploadRenderer = new XYMultipleSeriesRenderer();
-            multiUploadRenderer.setXLabels(0);
-            multiUploadRenderer.setYLabels(0);
-            multiUploadRenderer.setZoomEnabled(false);
-            multiUploadRenderer.setXAxisColor(Color.parseColor("#647488"));
-            multiUploadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-            multiUploadRenderer.setPanEnabled(false, false);
-            multiUploadRenderer.setZoomButtonsVisible(false);
-            multiUploadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-            multiUploadRenderer.addSeriesRenderer(uploadRenderer);
+            initUploadBwGraphic(multiUploadRenderer);
+
 
             //Reset value, graphics
             runOnUiThread(new Runnable() {
@@ -474,6 +508,8 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                         //Calc mPosition
                         double downloadRate = downloadTest.getInstantDownloadRate();
                         downloadRateList.add(downloadRate);
+
+                        Log.i(TAG, " upload -> " + downloadRate);
                         mPosition = getPositionByRate(downloadRate);
 
                         runOnUiThread(new Runnable() {
@@ -500,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                                 List<Double> tmpLs = new ArrayList<>(downloadRateList);
                                 int count = 0;
                                 for (Double val : tmpLs) {
+                                    Log.i(TAG, " upload -> " + val);
                                     downloadSeries.add(count++, val);
                                 }
 
@@ -561,6 +598,8 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                                 int count = 0;
                                 List<Double> tmpLs = new ArrayList<>(uploadRateList);
                                 for (Double val : tmpLs) {
+                                    Log.i(TAG, " upload -> " + val);
+
                                     if (count == 0) {
                                         val = 0.0;
                                     }
@@ -620,6 +659,75 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         }
     }
 
+
+    private void initPingGraphic(final XYMultipleSeriesRenderer multiPingRenderer){
+
+        XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
+        XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
+        pingFill.setColor(Color.parseColor("#4d5a6a"));
+        pingRenderer.addFillOutsideLine(pingFill);
+        pingRenderer.setDisplayChartValues(false);
+        pingRenderer.setShowLegendItem(false);
+        pingRenderer.setColor(Color.parseColor("#4d5a6a"));
+        pingRenderer.setLineWidth(5);
+        //final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
+        multiPingRenderer.setXLabels(0);
+        multiPingRenderer.setYLabels(0);
+        multiPingRenderer.setZoomEnabled(false);
+        multiPingRenderer.setXAxisColor(Color.parseColor("#647488"));
+        multiPingRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
+        multiPingRenderer.setPanEnabled(true, true);
+        multiPingRenderer.setZoomButtonsVisible(false);
+        multiPingRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
+        multiPingRenderer.addSeriesRenderer(pingRenderer);
+    }
+
+    private void initDownloadBwGraphic(final XYMultipleSeriesRenderer multiDownloadRenderer ){
+        //Init Download graphic
+        XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
+        XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
+        downloadFill.setColor(Color.parseColor("#4d5a6a"));
+        downloadRenderer.addFillOutsideLine(downloadFill);
+        downloadRenderer.setDisplayChartValues(false);
+        downloadRenderer.setColor(Color.parseColor("#4d5a6a"));
+        downloadRenderer.setShowLegendItem(false);
+        downloadRenderer.setLineWidth(5);
+        //final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
+        multiDownloadRenderer.setXLabels(0);
+        multiDownloadRenderer.setYLabels(0);
+        multiDownloadRenderer.setZoomEnabled(false);
+        multiDownloadRenderer.setXAxisColor(Color.parseColor("#647488"));
+        multiDownloadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
+        multiDownloadRenderer.setPanEnabled(false, false);
+        multiDownloadRenderer.setZoomButtonsVisible(false);
+        multiDownloadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
+        multiDownloadRenderer.addSeriesRenderer(downloadRenderer);
+
+    }
+
+
+    private void initUploadBwGraphic(final XYMultipleSeriesRenderer multiUploadRenderer){
+        //Init Upload graphic
+        XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
+        XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
+        uploadFill.setColor(Color.parseColor("#4d5a6a"));
+        uploadRenderer.addFillOutsideLine(uploadFill);
+        uploadRenderer.setDisplayChartValues(false);
+        uploadRenderer.setColor(Color.parseColor("#4d5a6a"));
+        uploadRenderer.setShowLegendItem(false);
+        uploadRenderer.setLineWidth(5);
+        //f = new XYMultipleSeriesRenderer();
+        multiUploadRenderer.setXLabels(0);
+        multiUploadRenderer.setYLabels(0);
+        multiUploadRenderer.setZoomEnabled(false);
+        multiUploadRenderer.setXAxisColor(Color.parseColor("#647488"));
+        multiUploadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
+        multiUploadRenderer.setPanEnabled(false, false);
+        multiUploadRenderer.setZoomButtonsVisible(false);
+        multiUploadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
+        multiUploadRenderer.addSeriesRenderer(uploadRenderer);
+    }
+
     private int getPositionByRate(double rate) {
         if (rate <= 1) {
             return (int) (rate * 30);
@@ -651,38 +759,49 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private void jniTest() {
 
         final JavaUtils javaUtils = new JavaUtils();
-        int heartBeat = 1000;
-        int hearBeatCount = 5;
+        javaUtils.createNativeNetwork();
+
+        int heartBeat = 500;
+        int hearBeatCount = 10;
         Callback callback = new Callback();
+
+        String probeIP = "184.170.218.205";
 
         final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat,hearBeatCount, callback);
 
-        String probeIP = "184.170.218.205";
-        networkStatistic.uploadBw(javaUtils, probeIP);
-
-        networkStatistic.downloadBw(javaUtils, probeIP);
         networkStatistic.lostrateAndRTT(javaUtils, probeIP);
         networkStatistic.downloadLossrate(javaUtils,probeIP);
+        networkStatistic.uploadBw(javaUtils, probeIP);
+        networkStatistic.downloadBw(javaUtils, probeIP);
     }
 
     ///callback data from  NetworkStatistic
     public class Callback implements  CallbackBase {
 
         @Override
-        public void call(int data){
-
-            Log.i("Callback" , "statisticNetwork int " + data);
+        public void onRTTandUploadLossCallback(int rtt, float uploadLoss) {
+            Log.i(TAG, "onRTTandUploadLossCallback uploadLoss " + uploadLoss+ " rtt " +rtt);
+            upLossrateList.add(uploadLoss);
+            rttList.add(rtt);
         }
 
         @Override
-        public void call(float data){
-
-            Log.i("Callback" , "statisticNetwork float " + data);
+        public void onUploadBwCallback(int upBw) {
+            Log.i(TAG, "onUploadBwCallback  " + upBw);
+            uploadBwList.add(upBw);
         }
 
         @Override
-        public void call(int data1, float data2) {
-            Log.i("Callback" , "statisticNetwork data1 " + data1+ " data2 "+data2);
+        public void onDownloadBwCallback(int downBw) {
+            Log.i(TAG, "onDownloadBwCallback  " + downBw);
+            downloadBwList.add(downBw);
+        }
+
+        @Override
+        public void onDownloadLossCallback(float downloadLoss) {
+            Log.i(TAG, "onDownloadLossCallback  " + downloadLoss);
+            downLossrateList.add(downloadLoss);
+
         }
     }
 

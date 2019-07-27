@@ -6,10 +6,10 @@ public interface CallbackBase {
 
     public static final String InterfaceName="CallBack";
 
-    public void call(int data);
-    public void call(float data);
-    public void call(int data1, float data2);
-
+    public void onRTTandUploadLossCallback(int rtt,float uploadLoss);
+    public void onUploadBwCallback(int upBw);
+    public void onDownloadBwCallback(int downBw);
+    public void onDownloadLossCallback(float downloadLoss);
 }
 
 

@@ -166,7 +166,7 @@ JNIEXPORT jint JNICALL Java_hack_com_tantan_JavaUtils_ProbingDownBw
     NetworkTT *networkTT = reinterpret_cast<NetworkTT *>(network);
     if (networkTT != nullptr) {
         const char *charIP = env->GetStringUTFChars(probeIP, nullptr);
-        networkTT->Probing_Up_Bw(charIP);
+        networkTT->Probing_Down_Bw(charIP);
         return 0;
     }
 
