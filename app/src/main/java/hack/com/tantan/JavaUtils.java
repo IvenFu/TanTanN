@@ -19,8 +19,6 @@ public class JavaUtils {
         Log.d(TAG, "createNativeNetwork " + nativeNetwork);
     }
 
-
-
     public  void  init(){
         createNativeNetwork();
         init(nativeNetwork);
@@ -29,8 +27,6 @@ public class JavaUtils {
     public void uninit(){
         uninit(nativeNetwork);
     }
-
-
 
     public int probingLostrateAndRTT(String probeIP){
         return ProbingLostrateAndRTT(nativeNetwork, probeIP);
@@ -59,6 +55,14 @@ public class JavaUtils {
     }
 
 
+    public int probingDownLostrate (String probeIP){
+        return ProbingDownLossrate(nativeNetwork,probeIP);
+    }
+
+    public float getDownLossrate () {
+        return GetDownLossrate(nativeNetwork);
+    }
+
     private native  long createNetwork(long nativeNetwork);
     private native  void  init(long nativeNetwork);
     private native  void  uninit(long nativeNetwork);
@@ -79,4 +83,11 @@ public class JavaUtils {
 
     //int pBitrate
     public native int GetDownBw(long nativeNetwork);
+
+    //String szServerIp
+    public native int ProbingDownLossrate(long nativeNetwork,String probeIP);
+    //float pfLossRate
+    public native float  GetDownLossrate(long nativeNetwork);
+
+
 }

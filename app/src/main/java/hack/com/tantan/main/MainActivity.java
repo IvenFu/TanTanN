@@ -651,8 +651,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     private void jniTest() {
 
-        final Button jniTest = (Button) findViewById(R.id.jniTest);
-
         final JavaUtils javaUtils = new JavaUtils();
         int heartBeat = 1000;
         int hearBeatCount = 5;
@@ -666,22 +664,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         networkStatistic.downloadBw(javaUtils, probeIP);
         networkStatistic.lostrateAndRTT(javaUtils, probeIP);
 
-
-        jniTest.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                //String probeIP = "172.16.10.129";
-                String probeIP = "184.170.218.205";
-                javaUtils.init();
-
-
-                networkStatistic.lostrateAndRTT(javaUtils, probeIP);
-                networkStatistic.uploadBw(javaUtils, probeIP);
-                networkStatistic.downloadBw(javaUtils, probeIP);
-
-                javaUtils.uninit();
-            }
-        });
     }
 
     ///callback data from  NetworkStatistic

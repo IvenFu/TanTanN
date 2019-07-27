@@ -195,14 +195,4 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/jniTest"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp"
-        android:background="#03A9F4"
-        android:visibility="visible"
-        tools:text="JNITest" />
-
 </RelativeLayout>

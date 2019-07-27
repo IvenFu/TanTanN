@@ -57,11 +57,12 @@ public class NetworkStatistic {
                     } catch (InterruptedException e) {
                     }
                 }
+                Log.i(TAG, "network return upBw end ");
             }
         };
 
         mMonitorHandler.post(mStatsRunnable);
-        Log.i(TAG, "network return upBw end ");
+
 
     }
 
@@ -87,11 +88,12 @@ public class NetworkStatistic {
                     } catch (InterruptedException e) {
                     }
                 }
+                Log.i(TAG, "network return downBw end ");
             }
         };
 
         mMonitorHandler.post(mStatsRunnable);
-        Log.i(TAG, "network return downBw end ");
+
     }
 
     public void lostrateAndRTT(final  JavaUtils javaUtils , String probeIP){
@@ -115,10 +117,40 @@ public class NetworkStatistic {
                     } catch (InterruptedException e) {
                     }
                 }
+                Log.i(TAG, "network return lossrate and  RTT end ");
+
             }
         };
 
         mMonitorHandler.post(mStatsRunnable);
-        Log.i(TAG, "network return lossrate and  RTT end ");
+    }
+
+    public void downloadLossrate(final  JavaUtils javaUtils , String probeIP){
+
+        javaUtils.probingDownLostrate(probeIP);
+        ///probe may take some time, so we sleep a while.
+        try {
+            Thread.sleep(mHeartBeat);
+        } catch (InterruptedException e) {
+        }
+
+        mStatsRunnable =  new Runnable() {
+            @Override
+            public void run() {
+                for(int i =0 ;i<mHeartBeatCount ;i++) {
+                    float downLossrate = javaUtils.getDownLossrate();
+
+                    mCallback.call(downLossrate);
+                    try {
+                        Thread.sleep(mHeartBeat);
+                    } catch (InterruptedException e) {
+                    }
+                }
+                Log.i(TAG, "network return download lossrate  end");
+            }
+
+        };
+
+        mMonitorHandler.post(mStatsRunnable);
     }
 }
