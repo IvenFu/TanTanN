@@ -3,10 +3,10 @@
     <string name="ping">PING</string>
     <string name="download">DOWNLOAD</string>
     <string name="upload">UPLOAD</string>
-    <string name="speedometer">速度表</string>
-    <string name="prob">开始检测</string>
-    <string name="details">详细数据</string>
+    <string name="speedometer">speedometer</string>
+    <string name="prob">probing</string>
+    <string name="details">details</string>
     <string name="begin_test">Begin Test</string>
     <string name="back">back</string>
-    <string name="test">测试</string>
+    <string name="test">test</string>
 </resources>
