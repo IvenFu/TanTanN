@@ -3,7 +3,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "com.hack.speedtest"
+        applicationId "com.hack.tantan"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 4
