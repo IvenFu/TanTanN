@@ -1,15 +1,12 @@
 package hack.com.tantan.main;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -23,10 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.netease.net.detector.sdk.config.ConfigService;
-import com.netease.net.detector.sdk.exception.NetDetectorException;
-
-import org.achartengine.renderer.XYMultipleSeriesRenderer;
-import org.achartengine.renderer.XYSeriesRenderer;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -129,8 +122,23 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
-        return super.onCreateOptionsMenu(menu);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_select_ip_1:
+                Toast.makeText(this, "选择IP1", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_select_ip_2:
+                Toast.makeText(this, "选择IP2", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -207,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 mDownloadBwLL.removeAllViews();
                 mUploadBwTV.setText("0 Mbps");
                 mUploadBwLL.removeAllViews();
+                mStartButton.setEnabled(true);
             }
         });
 

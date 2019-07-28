@@ -4,14 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.jiapeng.munedemo.MainActivity">
     <item
-        android:id="@+id/mune_enter"
+        android:id="@+id/menu_select_ip_1"
         android:orderInCategory="100"
-        android:title="选择服务1"
+        android:title="选择IP1"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/mune_setting"
+        android:id="@+id/menu_select_ip_2"
         android:orderInCategory="100"
-        android:title="选择服务2"
+        android:title="选择IP2"
         app:showAsAction="never"/>
-
 </menu>
