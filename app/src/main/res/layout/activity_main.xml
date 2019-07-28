@@ -41,13 +41,14 @@
             android:weightSum="4">
 
 
-            <LinearLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tv_rtt_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
@@ -55,24 +56,31 @@
                     android:textAlignment="center"
                     android:textColor="@color/textViewTitle"
                     android:textSize="12sp"
-                    android:textStyle="normal|bold" />
+                    android:textStyle="normal|bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_rtt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="0.00 Ms"
-                    android:textAlignment="center"
+                    android:tegit xtAlignment="center"
                     android:textColor="@android:color/background_light"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_rtt_title"/>
 
                 <LinearLayout
                     android:id="@+id/ll_rtt_chart"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"/>
+                    android:layout_height="70dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
 
-            </LinearLayout>
+            </android.support.constraint.ConstraintLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -104,8 +112,7 @@
                     android:id="@+id/ll_dw_loss_rate_chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    />
+                    android:orientation="vertical" />
 
 
             </LinearLayout>
@@ -140,7 +147,7 @@
                     android:id="@+id/ll_upload_chart"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"/>
+                    android:orientation="vertical" />
             </LinearLayout>
 
             <LinearLayout
