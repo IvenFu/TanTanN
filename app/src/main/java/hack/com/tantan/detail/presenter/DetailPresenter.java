@@ -51,7 +51,7 @@ public class DetailPresenter {
                     ReportStats reportStats = task.getCurrentReportStats();
                     List<QosInfo> qosInfoList = new ArrayList<>();
                     QosInfo qosInfo = new QosInfo();
-                    qosInfo.setHost(config.getQosList().get(0));
+                    qosInfo.setHost(MainActivity.detectIp);
                     qosInfo.setRtt((long) MainActivity.mRtt);
                     qosInfo.setDownloadBandwidth((long) MainActivity.mDownloadBw);
                     qosInfo.setDownloadLossRate(MainActivity.mDownLossRate);

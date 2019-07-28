@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -82,14 +83,17 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     final List<Double> mUploadRateLossList = new ArrayList<>();
 
 
-    int getDownloadBwCount = 0 ;
+    int getDownloadBwCount = 0;
     int heartBeat = 500;
     int hearBeatCount = 10;
-    String probeIP = "184.170.218.205";
+    public static String detectIp = "184.170.218.205";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         //沉浸式状态栏
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -131,8 +135,8 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_start:
-                 mStartButton.setEnabled(false);
-                 networkUpdate();
+                mStartButton.setEnabled(false);
+                networkUpdate();
                 break;
             case R.id.btn_detail:
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
@@ -217,102 +221,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
     }
 
-    private void initPingGraphic(final XYMultipleSeriesRenderer multiPingRenderer) {
-
-        XYSeriesRenderer pingRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine pingFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        pingFill.setColor(Color.parseColor("#4d5a6a"));
-        pingRenderer.addFillOutsideLine(pingFill);
-        pingRenderer.setDisplayChartValues(false);
-        pingRenderer.setShowLegendItem(false);
-        pingRenderer.setColor(Color.parseColor("#4d5a6a"));
-        pingRenderer.setLineWidth(5);
-        //final XYMultipleSeriesRenderer multiPingRenderer = new XYMultipleSeriesRenderer();
-        multiPingRenderer.setXLabels(0);
-        multiPingRenderer.setYLabels(0);
-        multiPingRenderer.setZoomEnabled(false);
-        multiPingRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiPingRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiPingRenderer.setPanEnabled(true, true);
-        multiPingRenderer.setZoomButtonsVisible(false);
-        multiPingRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiPingRenderer.addSeriesRenderer(pingRenderer);
-    }
-
-    private void initDownloadBwGraphic(final XYMultipleSeriesRenderer multiDownloadRenderer) {
-        //Init Download graphic
-        XYSeriesRenderer downloadRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine downloadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        downloadFill.setColor(Color.parseColor("#4d5a6a"));
-        downloadRenderer.addFillOutsideLine(downloadFill);
-        downloadRenderer.setDisplayChartValues(false);
-        downloadRenderer.setColor(Color.parseColor("#4d5a6a"));
-        downloadRenderer.setShowLegendItem(false);
-        downloadRenderer.setLineWidth(5);
-        //final XYMultipleSeriesRenderer multiDownloadRenderer = new XYMultipleSeriesRenderer();
-        multiDownloadRenderer.setXLabels(0);
-        multiDownloadRenderer.setYLabels(0);
-        multiDownloadRenderer.setZoomEnabled(false);
-        multiDownloadRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiDownloadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiDownloadRenderer.setPanEnabled(false, false);
-        multiDownloadRenderer.setZoomButtonsVisible(false);
-        multiDownloadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiDownloadRenderer.addSeriesRenderer(downloadRenderer);
-
-    }
-
-
-    private void initUploadBwGraphic(final XYMultipleSeriesRenderer multiUploadRenderer) {
-        //Init Upload graphic
-        XYSeriesRenderer uploadRenderer = new XYSeriesRenderer();
-        XYSeriesRenderer.FillOutsideLine uploadFill = new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BOUNDS_ALL);
-        uploadFill.setColor(Color.parseColor("#4d5a6a"));
-        uploadRenderer.addFillOutsideLine(uploadFill);
-        uploadRenderer.setDisplayChartValues(false);
-        uploadRenderer.setColor(Color.parseColor("#4d5a6a"));
-        uploadRenderer.setShowLegendItem(false);
-        uploadRenderer.setLineWidth(5);
-        //f = new XYMultipleSeriesRenderer();
-        multiUploadRenderer.setXLabels(0);
-        multiUploadRenderer.setYLabels(0);
-        multiUploadRenderer.setZoomEnabled(false);
-        multiUploadRenderer.setXAxisColor(Color.parseColor("#647488"));
-        multiUploadRenderer.setYAxisColor(Color.parseColor("#2F3C4C"));
-        multiUploadRenderer.setPanEnabled(false, false);
-        multiUploadRenderer.setZoomButtonsVisible(false);
-        multiUploadRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
-        multiUploadRenderer.addSeriesRenderer(uploadRenderer);
-    }
-
-    private int getPositionByRate(double rate) {
-        if (rate <= 1) {
-            return (int) (rate * 30);
-
-        } else if (rate <= 10) {
-            return (int) (rate * 6) + 30;
-
-        } else if (rate <= 30) {
-            return (int) ((rate - 10) * 3) + 90;
-
-        } else if (rate <= 50) {
-            return (int) ((rate - 30) * 1.5) + 150;
-
-        } else if (rate <= 100) {
-            return (int) ((rate - 50) * 1.2) + 180;
-        }
-
-        return 0;
-    }
-
-    private Looper startNewThread(String threadName, Runnable runnable) {
-        HandlerThread thread = new HandlerThread(threadName);
-        thread.start();
-        Handler handler = new Handler(thread.getLooper());
-        handler.post(runnable);
-        return thread.getLooper();
-    }
-
     private void networkUpdate() {
 
         final JavaUtils javaUtils = new JavaUtils();
@@ -324,11 +232,10 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         final NetworkStatistic networkStatistic = new NetworkStatistic(heartBeat, hearBeatCount, callback);
 
         try {
-            String ip = new ConfigService().get().getQosList().get(0);
-            networkStatistic.setProbeIP(ip);
+            detectIp = new ConfigService().get().getQosList().get(0);
         } catch (Exception e) {
-            networkStatistic.setProbeIP(probeIP);
         }
+        networkStatistic.setProbeIP(detectIp);
 
         networkStatistic.lostrateAndRTT(javaUtils);
         networkStatistic.downloadLossrate(javaUtils);
@@ -349,11 +256,11 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
                     Double sum = 0.0;
                     double rtt_ = 0.0;
-                    for(Double val:rttList){
+                    for (Double val : rttList) {
                         sum += val;
                     }
 
-                    if(rttList.size() != 0) {
+                    if (rttList.size() != 0) {
                         rtt_ = sum / rttList.size();
                     }
 
@@ -363,8 +270,8 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     mRtt = rtt_;
 
                     mUploadRateLossList.add((double) uploadLoss);
-                    sum =0.0;
-                    for (double value : mUploadRateLossList){
+                    sum = 0.0;
+                    for (double value : mUploadRateLossList) {
                         sum += value;
                     }
                     mUploadLossRate = sum / mUploadRateLossList.size();
@@ -384,18 +291,18 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
                     Double sum = 0.0;
                     double upBw = 0.0;
-                    for(Double val:uploadBwList){
+                    for (Double val : uploadBwList) {
                         sum += val;
                     }
 
-                    if(uploadBwList.size() != 0) {
+                    if (uploadBwList.size() != 0) {
                         upBw = sum / uploadBwList.size();
                     }
 
                     mUploadBwTV.setText(String.format(Locale.CHINA, "%.2f Mbps", (double) upBw));
                     mUploadBwLL.removeAllViews();
                     mUploadBwLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(uploadBwList, getBaseContext()));
-                    mUploadBw=upBw;
+                    mUploadBw = upBw;
 
                     mPosition = getPositionByRate(upBandWidth);
                     mRotate = new RotateAnimation(mLastPosition, mPosition, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -420,10 +327,10 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                     downloadBwList.add(downBandWidth);
 
                     Double sum = 0.0;
-                    for(Double val:downloadBwList){
+                    for (Double val : downloadBwList) {
                         sum += val;
                     }
-                    if(downloadBwList.size() != 0) {
+                    if (downloadBwList.size() != 0) {
                         downBandWidth = sum / downloadBwList.size();
                     }
 
@@ -443,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                 }
             });
         }
-
 
 
         private int getPositionByRate(double rate) {
@@ -481,11 +387,11 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
 
                     Double sum = 0.0;
                     double dnLossRate = 0;
-                    for(Double val:downLossRateList){
+                    for (Double val : downLossRateList) {
                         sum += val;
                     }
 
-                    if(downLossRateList.size() != 0) {
+                    if (downLossRateList.size() != 0) {
                         dnLossRate = sum / downLossRateList.size();
                     }
 
