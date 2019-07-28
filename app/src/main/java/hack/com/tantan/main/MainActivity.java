@@ -9,6 +9,7 @@ import android.os.Looper;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -62,11 +63,6 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
     private LinearLayout mUploadBwLL = null;
     private MainPresenter mPresenter = null;
     private RotateAnimation mRotate;
-
-    /**
-     * 测试用进程的名称
-     */
-    private static final String PROB_THREAD_NAME = "ProbThread";
 
     final List<Double> downLossRateList = new ArrayList<>();
 
@@ -129,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
         mLossRateLL = findViewById(R.id.ll_dw_loss_rate_chart);
         mDownloadBwLL = findViewById(R.id.ll_download_chart);
         mUploadBwLL = findViewById(R.id.ll_upload_chart);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -264,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements MainContractView,
                         rtt_ = sum / rttList.size();
                     }
 
-                    mRttTV.setText(String.format(Locale.CHINA, "%.2f Ms", (double) rtt_));
+                    mRttTV.setText(String.format(Locale.CHINA, "%.2f ms", (double) rtt_));
                     mRttLL.removeAllViews();
                     mRttLL.addView(XYMultipleSeriesRendererHandler.initGraphicalView(rttList, getBaseContext()));
                     mRtt = rtt_;

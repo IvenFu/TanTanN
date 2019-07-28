@@ -10,4 +10,6 @@
     <string name="back">Back</string>
     <string name="test">Test</string>
     <string name="rtt">Rtt</string>
+    <string name="ms">ms</string>
+    <string name="mbps">Mbps</string>
 </resources>
